@@ -1,2 +1,2 @@
 # rugrider
-Remake of an old school Commodore 64 video game.
+Remake of another old school Commodore 64 video game.
