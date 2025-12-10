@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Project Name="orxtest">
+  <VirtualDirectory Name="orxtest">
+    <VirtualDirectory Name="build">
+      <File Name="../../premake4.lua"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="bundle">
+      <File Name="../../../include/orxBundleData.inc"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="config">
+      <File Name="../../../data/config/CreationTemplate.ini"/>
+      <File Name="../../../data/config/ExtensionTemplate.ini"/>
+      <File Name="../../../data/config/SettingsTemplate.ini"/>
+      <File Name="../../../data/config/orxtest.ini"/>
+      <File Name="../../../data/config/orxtestd.ini"/>
+      <File Name="../../../data/config/orxtestp.ini"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="include">
+      <VirtualDirectory Name="extensions">
+        <VirtualDirectory Name="lz4">
+          <File Name="../../../include/extensions/lz4/lz4.h"/>
+          <File Name="../../../include/extensions/lz4/lz4hc.h"/>
+        </VirtualDirectory>
+        <File Name="../../../include/extensions/orxBundle.h"/>
+        <File Name="../../../include/extensions/orxExtensions.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="src">
+      <File Name="../../../src/orxtest.c"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <Settings Type="Executable">
+    <Configuration Name="Debug_x64" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtestd" IntermediateDirectory="$(ConfigurationName)" Command="./orxtestd" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-m64;-fno-exceptions;-Wno-unused-function" C_Options="-ffast-math;-g;-m64;-Wno-unused-function">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+        <Preprocessor Value="__orxDEBUG__"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m64;-L/usr/lib64;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orxd" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Profile_x64" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtestp" IntermediateDirectory="$(ConfigurationName)" Command="./orxtestp" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-O2;-m64;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-O2;-m64;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+        <Preprocessor Value="__orxPROFILER__"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m64;-L/usr/lib64;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orxp" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release_x64" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtest" IntermediateDirectory="$(ConfigurationName)" Command="./orxtest" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-O2;-m64;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-O2;-m64;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m64;-L/usr/lib64;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orx" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Bundle_x64" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtest" IntermediateDirectory="$(ConfigurationName)" Command="./orxtest" CommandArguments="-b orxtest.obr" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-O2;-m64;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-O2;-m64;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m64;-L/usr/lib64;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orx" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Debug_x32" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtestd" IntermediateDirectory="$(ConfigurationName)" Command="./orxtestd" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-msse2;-m32;-fno-exceptions;-Wno-unused-function" C_Options="-ffast-math;-g;-msse2;-m32;-Wno-unused-function">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+        <Preprocessor Value="__orxDEBUG__"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m32;-L/usr/lib32;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orxd" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Profile_x32" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtestp" IntermediateDirectory="$(ConfigurationName)" Command="./orxtestp" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-msse2;-O2;-m32;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-msse2;-O2;-m32;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+        <Preprocessor Value="__orxPROFILER__"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m32;-L/usr/lib32;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orxp" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Release_x32" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtest" IntermediateDirectory="$(ConfigurationName)" Command="./orxtest" CommandArguments="" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-msse2;-O2;-m32;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-msse2;-O2;-m32;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m32;-L/usr/lib32;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orx" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+    <Configuration Name="Bundle_x32" CompilerType="GCC" DebuggerType="GNU gdb debugger" Type="Executable">
+      <General OutputFile="../../../bin/orxtest" IntermediateDirectory="$(ConfigurationName)" Command="./orxtest" CommandArguments="-b orxtest.obr" WorkingDirectory="../../../bin" PauseExecWhenProcTerminates="yes"/>
+      <Compiler Required="yes" Options="-ffast-math;-g;-msse2;-O2;-m32;-fno-exceptions;-fno-rtti;-Wno-unused-function;-fschedule-insns" C_Options="-ffast-math;-g;-msse2;-O2;-m32;-Wno-unused-function;-fschedule-insns">
+        <IncludePath Value="$(ORX)/include"/>
+        <IncludePath Value="../../../include/extensions"/>
+        <IncludePath Value="../../../include"/>
+      </Compiler>
+      <Linker Required="yes" Options="-static-libgcc;-static-libstdc++;-m32;-L/usr/lib32;-Wl,-rpath ./;-Wl,--export-dynamic">
+        <LibraryPath Value="$(ORX)/lib/dynamic" />
+        <LibraryPath Value="." />
+        <Library Value="orx" />
+        <Library Value="dl" />
+        <Library Value="m" />
+        <Library Value="rt" />
+      </Linker>
+      <ResourceCompiler Required="no" Options=""/>
+      <PostBuild>
+        <Command Enabled="yes">cp -f $(ORX)/lib/dynamic/liborx*.so ../../../bin</Command>
+      </PostBuild>
+      <CustomBuild Enabled="no">
+        <CleanCommand></CleanCommand>
+        <BuildCommand></BuildCommand>
+        <SingleFileCommand></SingleFileCommand>
+        <MakefileGenerationCommand></MakefileGenerationCommand>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory></WorkingDirectory>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild></CustomPostBuild>
+        <CustomPreBuild></CustomPreBuild>
+      </AdditionalRules>
+    </Configuration>
+  </Settings>
+  <Dependencies name="Debug_x64">
+  </Dependencies>
+  <Dependencies name="Profile_x64">
+  </Dependencies>
+  <Dependencies name="Release_x64">
+  </Dependencies>
+  <Dependencies name="Bundle_x64">
+  </Dependencies>
+  <Dependencies name="Debug_x32">
+  </Dependencies>
+  <Dependencies name="Profile_x32">
+  </Dependencies>
+  <Dependencies name="Release_x32">
+  </Dependencies>
+  <Dependencies name="Bundle_x32">
+  </Dependencies>
+</CodeLite_Project>
