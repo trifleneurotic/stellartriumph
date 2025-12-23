@@ -30,14 +30,14 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   if (orxInput_IsActive("RotateLeft"))
   {
 	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
-	  orxFLOAT rotationChange = _pstClockInfo->fDT - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
 	  orxObject_SetRotation(shipObject, currentRotation - rotationChange);
   }
 
   if (orxInput_IsActive("RotateRight"))
   {
 	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
-	  orxFLOAT rotationChange = _pstClockInfo->fDT - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
 	  orxObject_SetRotation(shipObject, currentRotation + rotationChange);
   }
 
@@ -50,7 +50,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 	  orxFLOAT x = orxMath_Cos(currentRotation);
 	  orxFLOAT y = orxMath_Sin(currentRotation);
 	  orxVECTOR components = orxVECTOR_0;
-	  orxVector_Set(&components, x, y, 0);
+	  orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
 	  
 	  orxVECTOR newPosition = orxVECTOR_0;
 	  orxVector_Add(&newPosition, &components, &currentPosition);
