@@ -1,5 +1,5 @@
 /**
- * @file orxtest.c
+ * @file striumph.c
  * @date 8-Dec-2025
  */
 
@@ -14,6 +14,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // __orxMSVC__
 
+static orxOBJECT* shipObject		= orxNULL;
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -24,6 +25,39 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     // Send close event
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
   }
+
+
+  if (orxInput_IsActive("RotateLeft"))
+  {
+	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxFLOAT rotationChange = _pstClockInfo->fDT - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+	  orxObject_SetRotation(shipObject, currentRotation - rotationChange);
+  }
+
+  if (orxInput_IsActive("RotateRight"))
+  {
+	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxFLOAT rotationChange = _pstClockInfo->fDT - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+	  orxObject_SetRotation(shipObject, currentRotation + rotationChange);
+  }
+
+  if (orxInput_IsActive("Thrust"))
+  {
+	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxVECTOR currentPosition = orxVECTOR_0;
+	  orxObject_GetPosition(shipObject, &currentPosition);
+
+	  orxFLOAT x = orxMath_Cos(currentRotation);
+	  orxFLOAT y = orxMath_Sin(currentRotation);
+	  orxVECTOR components = orxVECTOR_0;
+	  orxVector_Set(&components, x, y, 0);
+	  
+	  orxVECTOR newPosition = orxVECTOR_0;
+	  orxVector_Add(&newPosition, &components, &currentPosition);
+
+	  orxObject_SetPosition(shipObject, &newPosition);
+  }	  
+
 }
 
 /** Camera Update function, it has been registered to be called every tick of the core clock, after physics & objects have been updated
@@ -66,7 +100,8 @@ orxSTATUS orxFASTCALL Init()
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), CameraUpdate, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_LOWER);
 
   // Create the scene
-  orxObject_CreateFromConfig("Scene");
+  orxObject_CreateFromConfig("Sound");
+  shipObject = orxObject_CreateFromConfig("Ship");
 
   // Done!
   return orxSTATUS_SUCCESS;

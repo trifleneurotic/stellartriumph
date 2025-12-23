@@ -6,18 +6,18 @@ ifndef config
 endif
 export config
 
-PROJECTS := orxtest
+PROJECTS := striumph
 
 .PHONY: all clean help $(PROJECTS)
 
 all: $(PROJECTS)
 
-orxtest: 
-	@echo "==== Building orxtest ($(config)) ===="
-	@${MAKE} --no-print-directory -C . -f orxtest.make
+striumph: 
+	@echo "==== Building striumph ($(config)) ===="
+	@${MAKE} --no-print-directory -C . -f striumph.make
 
 clean:
-	@${MAKE} --no-print-directory -C . -f orxtest.make clean
+	@${MAKE} --no-print-directory -C . -f striumph.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -39,6 +39,6 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
-	@echo "   orxtest"
+	@echo "   striumph"
 	@echo ""
 	@echo "For more information, see http://industriousone.com/premake/quick-start"

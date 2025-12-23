@@ -22,7 +22,7 @@ endif
 ifeq ($(config),debug64)
   OBJDIR     = obj/x64/Debug
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtestd
+  TARGET     = $(TARGETDIR)/striumphd
   DEFINES   += -D__orxDEBUG__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -46,7 +46,7 @@ endif
 ifeq ($(config),profile64)
   OBJDIR     = obj/x64/Profile
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtestp
+  TARGET     = $(TARGETDIR)/striumphp
   DEFINES   += -D__orxPROFILER__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -70,7 +70,7 @@ endif
 ifeq ($(config),release64)
   OBJDIR     = obj/x64/Release
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtest
+  TARGET     = $(TARGETDIR)/striumph
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -94,7 +94,7 @@ endif
 ifeq ($(config),bundle64)
   OBJDIR     = obj/x64/Bundle
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtest
+  TARGET     = $(TARGETDIR)/striumph
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -118,7 +118,7 @@ endif
 ifeq ($(config),debug32)
   OBJDIR     = obj/x32/Debug
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtestd
+  TARGET     = $(TARGETDIR)/striumphd
   DEFINES   += -D__orxDEBUG__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -142,7 +142,7 @@ endif
 ifeq ($(config),profile32)
   OBJDIR     = obj/x32/Profile
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtestp
+  TARGET     = $(TARGETDIR)/striumphp
   DEFINES   += -D__orxPROFILER__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -166,7 +166,7 @@ endif
 ifeq ($(config),release32)
   OBJDIR     = obj/x32/Release
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtest
+  TARGET     = $(TARGETDIR)/striumph
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -190,7 +190,7 @@ endif
 ifeq ($(config),bundle32)
   OBJDIR     = obj/x32/Bundle
   TARGETDIR  = ../../../bin
-  TARGET     = $(TARGETDIR)/orxtest
+  TARGET     = $(TARGETDIR)/striumph
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
@@ -218,14 +218,14 @@ ifeq ($(config),debugweb)
   RESCOMP    = :
   OBJDIR     = obj/Web/Debug
   TARGETDIR  = ../../../bin/web
-  TARGET     = $(TARGETDIR)/orxtest.js
+  TARGET     = $(TARGETDIR)/striumph.js
   DEFINES   += -D__orxDEBUG__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -fno-exceptions -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -fno-exceptions -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/orxtest.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -gsource-map
+  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/striumph.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -gsource-map
   LIBS      += -lorxd -lwebpdecoder -lliquidfun
   LDDEPS    +=
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(ALL_LDFLAGS) $(LIBS)
@@ -233,11 +233,11 @@ ifeq ($(config),debugweb)
   endef
   define PRELINKCMDS
 	@echo Running pre-link commands
-	cd ../../../bin && ./orxtest -b ../build/orxtest.obr
+	cd ../../../bin && ./striumph -b ../build/striumph.obr
   endef
   define POSTBUILDCMDS
 	@echo Running post-build commands
-	rm ../../../build/orxtest.obr
+	rm ../../../build/striumph.obr
   endef
 endif
 
@@ -248,14 +248,14 @@ ifeq ($(config),profileweb)
   RESCOMP    = :
   OBJDIR     = obj/Web/Profile
   TARGETDIR  = ../../../bin/web
-  TARGET     = $(TARGETDIR)/orxtest.js
+  TARGET     = $(TARGETDIR)/striumph.js
   DEFINES   += -D__orxPROFILER__
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/orxtest.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -O2
+  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/striumph.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -O2
   LIBS      += -lorxp -lwebpdecoder -lliquidfun
   LDDEPS    +=
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(ALL_LDFLAGS) $(LIBS)
@@ -263,11 +263,11 @@ ifeq ($(config),profileweb)
   endef
   define PRELINKCMDS
 	@echo Running pre-link commands
-	cd ../../../bin && ./orxtest -b ../build/orxtest.obr
+	cd ../../../bin && ./striumph -b ../build/striumph.obr
   endef
   define POSTBUILDCMDS
 	@echo Running post-build commands
-	rm ../../../build/orxtest.obr
+	rm ../../../build/striumph.obr
   endef
 endif
 
@@ -278,14 +278,14 @@ ifeq ($(config),releaseweb)
   RESCOMP    = :
   OBJDIR     = obj/Web/Release
   TARGETDIR  = ../../../bin/web
-  TARGET     = $(TARGETDIR)/orxtest.js
+  TARGET     = $(TARGETDIR)/striumph.js
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/orxtest.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -O2
+  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/striumph.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js -O2
   LIBS      += -lorx -lwebpdecoder -lliquidfun
   LDDEPS    +=
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(ALL_LDFLAGS) $(LIBS)
@@ -293,11 +293,11 @@ ifeq ($(config),releaseweb)
   endef
   define PRELINKCMDS
 	@echo Running pre-link commands
-	cd ../../../bin && ./orxtest -b ../build/orxtest.obr
+	cd ../../../bin && ./striumph -b ../build/striumph.obr
   endef
   define POSTBUILDCMDS
 	@echo Running post-build commands
-	rm ../../../build/orxtest.obr
+	rm ../../../build/striumph.obr
   endef
 endif
 
@@ -308,14 +308,14 @@ ifeq ($(config),bundleweb)
   RESCOMP    = :
   OBJDIR     = obj/Web/Bundle
   TARGETDIR  = ../../../bin/web
-  TARGET     = $(TARGETDIR)/orxtest.js
+  TARGET     = $(TARGETDIR)/striumph.js
   DEFINES   +=
   INCLUDES  += -I$(ORX)/include -I../../../include/extensions -I../../../include
   ALL_CPPFLAGS  += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
-  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"orxtest.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
+  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -O2 -fno-exceptions -fno-rtti -DorxWEB_EXECUTABLE_NAME='"striumph.wasm"' -Wno-undefined-var-template --use-port=contrib.glfw3 -pthread
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/orxtest.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js
+  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/static/web -L$(ORX)/../extern/libwebp/lib/web -L$(ORX)/../extern/LiquidFun-1.1.0/lib/web -L. --preload-file ../../../build/striumph.obr@/ -sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sAUDIO_WORKLET=1 -sWASM_WORKERS=1 -sSTACK_SIZE=1048576 -sASYNCIFY -sALLOW_MEMORY_GROWTH -sFULL_ES3=1 --use-port=contrib.glfw3 -pthread -lidbfs.js
   LIBS      += -lorx -lwebpdecoder -lliquidfun
   LDDEPS    +=
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(ALL_LDFLAGS) $(LIBS)
@@ -323,16 +323,16 @@ ifeq ($(config),bundleweb)
   endef
   define PRELINKCMDS
 	@echo Running pre-link commands
-	cd ../../../bin && ./orxtest -b ../build/orxtest.obr
+	cd ../../../bin && ./striumph -b ../build/striumph.obr
   endef
   define POSTBUILDCMDS
 	@echo Running post-build commands
-	rm ../../../build/orxtest.obr
+	rm ../../../build/striumph.obr
   endef
 endif
 
 OBJECTS := \
-	$(OBJDIR)/orxtest.o \
+	$(OBJDIR)/striumph.o \
 
 RESOURCES := \
 
@@ -350,7 +350,7 @@ all: $(TARGETDIR) $(OBJDIR) $(TARGET)
 	@:
 
 $(TARGET): prebuild $(GCH) $(OBJECTS) $(LDDEPS) $(RESOURCES) prelink
-	@echo Linking orxtest
+	@echo Linking striumph
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -371,7 +371,7 @@ else
 endif
 
 clean:
-	@echo Cleaning orxtest
+	@echo Cleaning striumph
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -393,7 +393,7 @@ $(GCH): $(PCH)
 	$(SILENT) $(CC) -x c-header $(ALL_CFLAGS) -MMD -MP $(DEFINES) $(INCLUDES) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
 endif
 
-$(OBJDIR)/orxtest.o: ../../../src/orxtest.c
+$(OBJDIR)/striumph.o: ../../../src/striumph.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 
