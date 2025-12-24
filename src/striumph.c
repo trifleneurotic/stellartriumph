@@ -5,6 +5,8 @@
 
 #include "orx.h"
 #include "orxExtensions.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 #ifdef __orxMSVC__
 
@@ -15,6 +17,9 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif // __orxMSVC__
 
 static orxOBJECT* shipObject		= orxNULL;
+static orxFLOAT screenWidth		= 0.0f;
+static orxFLOAT screenHeight		= 0.0f;
+
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -46,16 +51,75 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
 	  orxVECTOR currentPosition = orxVECTOR_0;
 	  orxObject_GetPosition(shipObject, &currentPosition);
-
-	  orxFLOAT x = orxMath_Cos(currentRotation);
-	  orxFLOAT y = orxMath_Sin(currentRotation);
-	  orxVECTOR components = orxVECTOR_0;
-	  orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
-	  
 	  orxVECTOR newPosition = orxVECTOR_0;
-	  orxVector_Add(&newPosition, &components, &currentPosition);
 
-	  orxObject_SetPosition(shipObject, &newPosition);
+	  orxFLOAT test = (orxFLOAT)screenHeight;
+
+	  bool clamp = true;
+	  bool borderHit = false;
+
+	  // Check and wrap horizontally
+          if (currentPosition.fX < -screenWidth / 2.0f)
+	  {
+	    if (!clamp)
+	    {
+		    currentPosition.fX += screenWidth; // Move to the right side
+	            borderHit = true;
+	    }
+	    else
+	    {
+		    currentPosition.fX += 2.3f;
+	    }
+	  }
+          else if (currentPosition.fX > screenWidth / 2.0f)
+	  {
+	    if (!clamp)
+	    {
+		    currentPosition.fX -= screenWidth; // Move to the left side
+	            borderHit = true;
+	    }
+	    else
+	    {
+		    currentPosition.fX -= 2.3f;
+	    }
+	  }
+
+	  // Check and wrap vertically (adjust for your game's Y-axis orientation)
+          if (currentPosition.fY < -screenHeight / 2.0f)
+          {
+	    if (!clamp)
+	    {
+		    currentPosition.fY += screenHeight; // Move to the bottom
+		    borderHit = true;
+	    }
+	    else
+	    {
+		    currentPosition.fY += 2.3f; // bounce ship off edge
+	    }
+	  }
+          else if (currentPosition.fY > screenHeight / 2.0f)
+	  {
+	    if (!clamp)
+	    {
+		    currentPosition.fY -= screenHeight; // Move to the top
+	            borderHit = true;
+	    }
+	    else
+	    {
+		    currentPosition.fY -= 2.3f;
+	    }
+          }
+
+	  if ((!clamp && borderHit) || !borderHit)
+	  {
+		  orxFLOAT x = orxMath_Cos(currentRotation);
+		  orxFLOAT y = orxMath_Sin(currentRotation);
+		  orxVECTOR components = orxVECTOR_0;
+		  orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
+		 
+		  orxVector_Add(&newPosition, &components, &currentPosition);
+		  orxObject_SetPosition(shipObject, &newPosition);
+	  }
   }	  
 
 }
@@ -102,6 +166,14 @@ orxSTATUS orxFASTCALL Init()
   // Create the scene
   orxObject_CreateFromConfig("Sound");
   shipObject = orxObject_CreateFromConfig("Ship");
+
+  orxDISPLAY_VIDEO_MODE videoMode;
+  /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
+  orxDisplay_GetVideoMode(orxU32_UNDEFINED, &videoMode);
+
+  /* The width can then be accessed */
+  screenWidth = (orxFLOAT)videoMode.u32Width;
+  screenHeight = (orxFLOAT)videoMode.u32Height;
 
   // Done!
   return orxSTATUS_SUCCESS;
