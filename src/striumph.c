@@ -17,6 +17,8 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif // __orxMSVC__
 
 static orxOBJECT* shipObject		= orxNULL;
+static orxOBJECT* gunObject		= orxNULL;
+static orxSPAWNER* spawnerObject	= orxNULL;
 static orxFLOAT screenWidth		= 0.0f;
 static orxFLOAT screenHeight		= 0.0f;
 
@@ -44,6 +46,17 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
 	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
 	  orxObject_SetRotation(shipObject, currentRotation + rotationChange);
+  }
+
+  // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
+
+  if (orxInput_IsActive("Shoot"))
+  {
+	  orxObject_Enable(gunObject, orxTRUE);
+  }
+  else
+  {
+	  orxObject_Enable(gunObject, orxFALSE);
   }
 
   if (orxInput_IsActive("Thrust"))
@@ -166,6 +179,9 @@ orxSTATUS orxFASTCALL Init()
   // Create the scene
   orxObject_CreateFromConfig("Sound");
   shipObject = orxObject_CreateFromConfig("Ship");
+  spawnerObject = orxSpawner_CreateFromConfig("ShotSpawner");
+  gunObject = (orxOBJECT*)orxObject_GetChild(shipObject);
+  orxObject_Enable(gunObject, orxFALSE);
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
