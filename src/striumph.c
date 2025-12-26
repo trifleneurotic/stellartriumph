@@ -19,9 +19,9 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 static orxOBJECT* shipObject		= orxNULL;
 static orxOBJECT* gunObject		= orxNULL;
 static orxSPAWNER* spawnerObject	= orxNULL;
+static orxOBJECT* vMonolithObject	= orxNULL;
 static orxFLOAT screenWidth		= 0.0f;
 static orxFLOAT screenHeight		= 0.0f;
-
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -52,6 +52,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_IsActive("Shoot"))
   {
+	  orxVECTOR v = orxVECTOR_0;
 	  orxObject_Enable(gunObject, orxTRUE);
   }
   else
@@ -137,6 +138,38 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
 }
 
+orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
+{
+
+    if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD)
+    {
+	    orxOBJECT *pstRecipientObject, *pstSenderObject;
+	    
+	    pstSenderObject = orxOBJECT(_pstEvent->hSender);
+	    pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
+	    
+	    orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
+	    orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
+	    
+	    if (orxString_Compare(senderObjectName, "Shot") == 0)
+	    {
+		    if (orxString_Compare(recipientObjectName, "VMonolith") == 0)
+		    {
+			    orxLOG("Collision between shot & monolith! (shot sender)");
+		    }
+	    } 
+	    
+	    if (orxString_Compare(senderObjectName, "VMonolith") == 0)
+	    {
+		    if (orxString_Compare(recipientObjectName, "Shot") == 0)
+		    {
+			    orxLOG("Collision between shot & monolith! (monolith sender)");
+		    }
+	    }
+    }
+    return orxSTATUS_SUCCESS;
+}
+
 /** Camera Update function, it has been registered to be called every tick of the core clock, after physics & objects have been updated
 */
 void orxFASTCALL CameraUpdate(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -176,12 +209,14 @@ orxSTATUS orxFASTCALL Init()
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), CameraUpdate, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_LOWER);
 
+
   // Create the scene
   orxObject_CreateFromConfig("Sound");
   shipObject = orxObject_CreateFromConfig("Ship");
   spawnerObject = orxSpawner_CreateFromConfig("ShotSpawner");
   gunObject = (orxOBJECT*)orxObject_GetChild(shipObject);
   orxObject_Enable(gunObject, orxFALSE);
+  vMonolithObject = orxObject_CreateFromConfig("VMonolith");
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
@@ -192,6 +227,7 @@ orxSTATUS orxFASTCALL Init()
   screenHeight = (orxFLOAT)videoMode.u32Height;
 
   // Done!
+  orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
   return orxSTATUS_SUCCESS;
 }
 
