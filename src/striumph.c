@@ -22,6 +22,8 @@ static orxSPAWNER* spawnerObject	= orxNULL;
 static orxOBJECT* vMonolithObject	= orxNULL;
 static orxFLOAT screenWidth		= 0.0f;
 static orxFLOAT screenHeight		= 0.0f;
+static orxOBJECT* sunObject		= orxNULL;
+
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -217,6 +219,7 @@ orxSTATUS orxFASTCALL Init()
   gunObject = (orxOBJECT*)orxObject_GetChild(shipObject);
   orxObject_Enable(gunObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
+  sunObject = orxObject_CreateFromConfig("SunObject");
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
