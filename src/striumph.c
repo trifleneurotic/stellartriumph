@@ -11,178 +11,176 @@
 #ifdef __orxMSVC__
 
 /* Requesting high performance dedicated GPU on hybrid laptops */
-__declspec(dllexport) unsigned long NvOptimusEnablement        = 1;
+__declspec(dllexport) unsigned long NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // __orxMSVC__
 
-static orxOBJECT* redShipObject		= orxNULL;
-static orxOBJECT* blueShipObject	= orxNULL;
-static orxOBJECT* redGunObject		= orxNULL;
-static orxOBJECT* blueGunObject		= orxNULL;
-static orxSPAWNER* spawnerObject	= orxNULL;
-static orxOBJECT* vMonolithObject	= orxNULL;
-static orxFLOAT screenWidth		= 0.0f;
-static orxFLOAT screenHeight		= 0.0f;
-static orxOBJECT* sunObject		= orxNULL;
+static orxOBJECT *redShipObject = orxNULL;
+static orxOBJECT *blueShipObject = orxNULL;
+static orxOBJECT *redGunObject = orxNULL;
+static orxOBJECT *blueGunObject = orxNULL;
+static orxSPAWNER *spawnerObject = orxNULL;
+static orxOBJECT *vMonolithObject = orxNULL;
+static orxFLOAT screenWidth = 0.0f;
+static orxFLOAT screenHeight = 0.0f;
+static orxOBJECT *sunObject = orxNULL;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 {
   // Should quit?
-  if(orxInput_HasBeenActivated("Quit"))
+  if (orxInput_HasBeenActivated("Quit"))
   {
     // Send close event
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
   }
 
-
   if (orxInput_IsActive("RotateLeft"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-	  orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
+    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+    orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+    orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
   }
 
   if (orxInput_IsActive("RotateRight"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-	  orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
+    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+    orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+    orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
   }
 
   // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
 
   if (orxInput_IsActive("Shoot"))
   {
-	  orxVECTOR v = orxVECTOR_0;
-	  orxObject_Enable(redGunObject, orxTRUE);
+    orxVECTOR v = orxVECTOR_0;
+    orxObject_Enable(redGunObject, orxTRUE);
   }
   else
   {
-	  orxObject_Enable(redGunObject, orxFALSE);
+    orxObject_Enable(redGunObject, orxFALSE);
   }
 
   if (orxInput_IsActive("Thrust"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-	  orxVECTOR currentPosition = orxVECTOR_0;
-	  orxObject_GetPosition(redShipObject, &currentPosition);
-	  orxVECTOR newPosition = orxVECTOR_0;
+    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+    orxVECTOR currentPosition = orxVECTOR_0;
+    orxObject_GetPosition(redShipObject, &currentPosition);
+    orxVECTOR newPosition = orxVECTOR_0;
 
-	  orxFLOAT test = (orxFLOAT)screenHeight;
+    orxFLOAT test = (orxFLOAT)screenHeight;
 
-	  bool clamp = true;
-	  bool borderHit = false;
+    bool clamp = true;
+    bool borderHit = false;
 
-	  // Check and wrap horizontally
-          if (currentPosition.fX < -screenWidth / 2.0f)
-	  {
-	    if (!clamp)
-	    {
-		    currentPosition.fX += screenWidth; // Move to the right side
-	            borderHit = true;
-	    }
-	    else
-	    {
-		    currentPosition.fX += 2.3f;
-	    }
-	  }
-          else if (currentPosition.fX > screenWidth / 2.0f)
-	  {
-	    if (!clamp)
-	    {
-		    currentPosition.fX -= screenWidth; // Move to the left side
-	            borderHit = true;
-	    }
-	    else
-	    {
-		    currentPosition.fX -= 2.3f;
-	    }
-	  }
+    // Check and wrap horizontally
+    if (currentPosition.fX < -screenWidth / 2.0f)
+    {
+      if (!clamp)
+      {
+        currentPosition.fX += screenWidth; // Move to the right side
+        borderHit = true;
+      }
+      else
+      {
+        currentPosition.fX += 2.3f;
+      }
+    }
+    else if (currentPosition.fX > screenWidth / 2.0f)
+    {
+      if (!clamp)
+      {
+        currentPosition.fX -= screenWidth; // Move to the left side
+        borderHit = true;
+      }
+      else
+      {
+        currentPosition.fX -= 2.3f;
+      }
+    }
 
-	  // Check and wrap vertically (adjust for your game's Y-axis orientation)
-          if (currentPosition.fY < -screenHeight / 2.0f)
-          {
-	    if (!clamp)
-	    {
-		    currentPosition.fY += screenHeight; // Move to the bottom
-		    borderHit = true;
-	    }
-	    else
-	    {
-		    currentPosition.fY += 2.3f; // bounce ship off edge
-	    }
-	  }
-          else if (currentPosition.fY > screenHeight / 2.0f)
-	  {
-	    if (!clamp)
-	    {
-		    currentPosition.fY -= screenHeight; // Move to the top
-	            borderHit = true;
-	    }
-	    else
-	    {
-		    currentPosition.fY -= 2.3f;
-	    }
-          }
+    // Check and wrap vertically (adjust for your game's Y-axis orientation)
+    if (currentPosition.fY < -screenHeight / 2.0f)
+    {
+      if (!clamp)
+      {
+        currentPosition.fY += screenHeight; // Move to the bottom
+        borderHit = true;
+      }
+      else
+      {
+        currentPosition.fY += 2.3f; // bounce ship off edge
+      }
+    }
+    else if (currentPosition.fY > screenHeight / 2.0f)
+    {
+      if (!clamp)
+      {
+        currentPosition.fY -= screenHeight; // Move to the top
+        borderHit = true;
+      }
+      else
+      {
+        currentPosition.fY -= 2.3f;
+      }
+    }
 
-	  if ((!clamp && borderHit) || !borderHit)
-	  {
-		  orxFLOAT x = orxMath_Cos(currentRotation);
-		  orxFLOAT y = orxMath_Sin(currentRotation);
-		  orxVECTOR components = orxVECTOR_0;
-		  orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
-		 
-		  orxVector_Add(&newPosition, &components, &currentPosition);
-		  orxObject_SetPosition(redShipObject, &newPosition);
-	  }
-  }	  
+    if ((!clamp && borderHit) || !borderHit)
+    {
+      orxFLOAT x = orxMath_Cos(currentRotation);
+      orxFLOAT y = orxMath_Sin(currentRotation);
+      orxVECTOR components = orxVECTOR_0;
+      orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
 
+      orxVector_Add(&newPosition, &components, &currentPosition);
+      orxObject_SetPosition(redShipObject, &newPosition);
+    }
+  }
 }
 
 orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 {
 
-    if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD)
+  if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD)
+  {
+    orxOBJECT *pstRecipientObject, *pstSenderObject;
+
+    pstSenderObject = orxOBJECT(_pstEvent->hSender);
+    pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
+
+    orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
+    orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
+
+    if (orxString_Compare(senderObjectName, "Shot") == 0)
     {
-	    orxOBJECT *pstRecipientObject, *pstSenderObject;
-	    
-	    pstSenderObject = orxOBJECT(_pstEvent->hSender);
-	    pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
-	    
-	    orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
-	    orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
-	    
-	    if (orxString_Compare(senderObjectName, "Shot") == 0)
-	    {
-		    if (orxString_Compare(recipientObjectName, "VMonolith") == 0)
-		    {
-			    orxLOG("Collision between shot & monolith! (shot sender)");
-		    }
-	    } 
-	    
-	    if (orxString_Compare(senderObjectName, "VMonolith") == 0)
-	    {
-		    if (orxString_Compare(recipientObjectName, "Shot") == 0)
-		    {
-			    orxLOG("Collision between shot & monolith! (monolith sender)");
-		    }
-	    }
+      if (orxString_Compare(recipientObjectName, "VMonolith") == 0)
+      {
+        orxLOG("Collision between shot & monolith! (shot sender)");
+      }
     }
-    return orxSTATUS_SUCCESS;
+
+    if (orxString_Compare(senderObjectName, "VMonolith") == 0)
+    {
+      if (orxString_Compare(recipientObjectName, "Shot") == 0)
+      {
+        orxLOG("Collision between shot & monolith! (monolith sender)");
+      }
+    }
+  }
+  return orxSTATUS_SUCCESS;
 }
 
 /** Camera Update function, it has been registered to be called every tick of the core clock, after physics & objects have been updated
-*/
+ */
 void orxFASTCALL CameraUpdate(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 {
   // Get MainCamera proxy object
   orxConfig_PushSection("MainCamera");
   orxOBJECT *pstMainCamera = orxOBJECT(orxStructure_Get(orxConfig_GetU64("ID")));
   orxConfig_PopSection();
-  if(pstMainCamera)
+  if (pstMainCamera)
   {
     // Update & move the camera here
     // [...]
@@ -204,7 +202,7 @@ orxSTATUS orxFASTCALL Init()
   orxConfig_PushSection("Main");
 
   // Create the viewports
-  for(orxS32 i = 0, iCount = orxConfig_GetListCount("ViewportList"); i < iCount; i++)
+  for (orxS32 i = 0, iCount = orxConfig_GetListCount("ViewportList"); i < iCount; i++)
   {
     orxViewport_CreateFromConfig(orxConfig_GetListString("ViewportList", i));
   }
@@ -213,15 +211,14 @@ orxSTATUS orxFASTCALL Init()
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), CameraUpdate, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_LOWER);
 
-
   // Create the scene
   orxObject_CreateFromConfig("Sound");
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   spawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
   spawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
-  redGunObject = (orxOBJECT*)orxObject_GetChild(redShipObject);
-  blueGunObject = (orxOBJECT*)orxObject_GetChild(blueShipObject);
+  redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
+  blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
