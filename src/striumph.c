@@ -16,8 +16,10 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // __orxMSVC__
 
-static orxOBJECT* shipObject		= orxNULL;
-static orxOBJECT* gunObject		= orxNULL;
+static orxOBJECT* redShipObject		= orxNULL;
+static orxOBJECT* blueShipObject	= orxNULL;
+static orxOBJECT* redGunObject		= orxNULL;
+static orxOBJECT* blueGunObject		= orxNULL;
 static orxSPAWNER* spawnerObject	= orxNULL;
 static orxOBJECT* vMonolithObject	= orxNULL;
 static orxFLOAT screenWidth		= 0.0f;
@@ -38,16 +40,16 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_IsActive("RotateLeft"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
 	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-	  orxObject_SetRotation(shipObject, currentRotation - rotationChange);
+	  orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
   }
 
   if (orxInput_IsActive("RotateRight"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
 	  orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-	  orxObject_SetRotation(shipObject, currentRotation + rotationChange);
+	  orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
   }
 
   // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
@@ -55,18 +57,18 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   if (orxInput_IsActive("Shoot"))
   {
 	  orxVECTOR v = orxVECTOR_0;
-	  orxObject_Enable(gunObject, orxTRUE);
+	  orxObject_Enable(redGunObject, orxTRUE);
   }
   else
   {
-	  orxObject_Enable(gunObject, orxFALSE);
+	  orxObject_Enable(redGunObject, orxFALSE);
   }
 
   if (orxInput_IsActive("Thrust"))
   {
-	  orxFLOAT currentRotation = orxObject_GetRotation(shipObject);
+	  orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
 	  orxVECTOR currentPosition = orxVECTOR_0;
-	  orxObject_GetPosition(shipObject, &currentPosition);
+	  orxObject_GetPosition(redShipObject, &currentPosition);
 	  orxVECTOR newPosition = orxVECTOR_0;
 
 	  orxFLOAT test = (orxFLOAT)screenHeight;
@@ -134,7 +136,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 		  orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
 		 
 		  orxVector_Add(&newPosition, &components, &currentPosition);
-		  orxObject_SetPosition(shipObject, &newPosition);
+		  orxObject_SetPosition(redShipObject, &newPosition);
 	  }
   }	  
 
@@ -214,10 +216,14 @@ orxSTATUS orxFASTCALL Init()
 
   // Create the scene
   orxObject_CreateFromConfig("Sound");
-  shipObject = orxObject_CreateFromConfig("Ship");
-  spawnerObject = orxSpawner_CreateFromConfig("ShotSpawner");
-  gunObject = (orxOBJECT*)orxObject_GetChild(shipObject);
-  orxObject_Enable(gunObject, orxFALSE);
+  redShipObject = orxObject_CreateFromConfig("Red");
+  blueShipObject = orxObject_CreateFromConfig("Blue");
+  spawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
+  spawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
+  redGunObject = (orxOBJECT*)orxObject_GetChild(redShipObject);
+  blueGunObject = (orxOBJECT*)orxObject_GetChild(blueShipObject);
+  orxObject_Enable(redGunObject, orxFALSE);
+  orxObject_Enable(blueGunObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
   sunObject = orxObject_CreateFromConfig("SunObject");
 
