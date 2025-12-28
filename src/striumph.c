@@ -20,11 +20,13 @@ static orxOBJECT *redShipObject = orxNULL;
 static orxOBJECT *blueShipObject = orxNULL;
 static orxOBJECT *redGunObject = orxNULL;
 static orxOBJECT *blueGunObject = orxNULL;
-static orxSPAWNER *spawnerObject = orxNULL;
+static orxSPAWNER *redSpawnerObject = orxNULL;
+static orxSPAWNER *blueSpawnerObject = orxNULL;
 static orxOBJECT *vMonolithObject = orxNULL;
 static orxFLOAT screenWidth = 0.0f;
 static orxFLOAT screenHeight = 0.0f;
 static orxOBJECT *sunObject = orxNULL;
+static orxOBJECT *explosionObject = orxNULL;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -140,12 +142,42 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   }
 }
 
+orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
+{
+  orxANIM_EVENT_PAYLOAD *pstPayload;
+
+  pstPayload = (orxANIM_EVENT_PAYLOAD *)_pstEvent->pstPayload;
+
+  switch (_pstEvent->eID)
+  {
+  case orxANIM_EVENT_START:
+    orxLOG("Animation <%s>@<%s> has started!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
+    break;
+
+  case orxANIM_EVENT_STOP:
+    orxLOG("Animation <%s>@<%s> has stopped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
+    break;
+
+  case orxANIM_EVENT_CUT:
+    orxLOG("Animation <%s>@<%s> has been cut!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
+    break;
+
+  case orxANIM_EVENT_LOOP:
+    orxLOG("Animation <%s>@<%s> has looped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
+    orxObject_Enable(explosionObject, orxFALSE);
+    break;
+  }
+
+  return orxSTATUS_SUCCESS;
+}
+
 orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 {
 
   if (_pstEvent->eID == orxPHYSICS_EVENT_CONTACT_ADD)
   {
     orxOBJECT *pstRecipientObject, *pstSenderObject;
+    orxVECTOR vContactPoint;
 
     pstSenderObject = orxOBJECT(_pstEvent->hSender);
     pstRecipientObject = orxOBJECT(_pstEvent->hRecipient);
@@ -153,19 +185,20 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
     orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSenderObject);
     orxSTRING recipientObjectName = (orxSTRING)orxObject_GetName(pstRecipientObject);
 
-    if (orxString_Compare(senderObjectName, "Shot") == 0)
-    {
-      if (orxString_Compare(recipientObjectName, "VMonolith") == 0)
-      {
-        orxLOG("Collision between shot & monolith! (shot sender)");
-      }
-    }
+    orxLOG("%s"
+           " collided with "
+           "%s",
+           senderObjectName, recipientObjectName);
 
-    if (orxString_Compare(senderObjectName, "VMonolith") == 0)
+    if (orxString_Compare(senderObjectName, "Blue") == 0)
     {
       if (orxString_Compare(recipientObjectName, "Shot") == 0)
       {
-        orxLOG("Collision between shot & monolith! (monolith sender)");
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(blueShipObject, orxFALSE);
       }
     }
   }
@@ -215,12 +248,14 @@ orxSTATUS orxFASTCALL Init()
   orxObject_CreateFromConfig("Sound");
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
-  spawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
-  spawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
+  redSpawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
+  blueSpawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
   redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
+  explosionObject = orxObject_CreateFromConfig("ExplosionObject");
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
+  orxObject_Enable(explosionObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
   sunObject = orxObject_CreateFromConfig("SunObject");
 
@@ -234,6 +269,7 @@ orxSTATUS orxFASTCALL Init()
 
   // Done!
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
+  orxEvent_AddHandler(orxEVENT_TYPE_ANIM, AnimationEventHandler);
   return orxSTATUS_SUCCESS;
 }
 
