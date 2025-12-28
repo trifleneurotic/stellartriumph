@@ -147,6 +147,11 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
   orxANIM_EVENT_PAYLOAD *pstPayload;
 
   pstPayload = (orxANIM_EVENT_PAYLOAD *)_pstEvent->pstPayload;
+  orxVECTOR newShipPos = orxVECTOR_0;
+  newShipPos.fX = -400;
+  newShipPos.fY = 0;
+  newShipPos.fZ = 0;
+  orxVECTOR newShipSpeed = orxVECTOR_0;
 
   switch (_pstEvent->eID)
   {
@@ -164,7 +169,15 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
 
   case orxANIM_EVENT_LOOP:
     orxLOG("Animation <%s>@<%s> has looped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
-    orxObject_Enable(explosionObject, orxFALSE);
+    if (orxString_Compare(pstPayload->zAnimName, "ExplosionFire") == 0)
+    {
+      orxObject_Enable(explosionObject, orxFALSE);
+      orxObject_SetPosition(blueShipObject, &newShipPos);
+      orxObject_SetRelativeSpeed(blueShipObject, &newShipSpeed);
+      orxObject_SetAngularVelocity(blueShipObject, 0.0f);
+      orxObject_Enable(blueShipObject, orxTRUE);
+    }
+
     break;
   }
 
