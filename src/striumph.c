@@ -7,6 +7,7 @@
 #include "orxExtensions.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <agar/core.h>
 
 #ifdef __orxMSVC__
 
@@ -27,6 +28,12 @@ static orxFLOAT screenWidth = 0.0f;
 static orxFLOAT screenHeight = 0.0f;
 static orxOBJECT *sunObject = orxNULL;
 static orxOBJECT *explosionObject = orxNULL;
+static orxOBJECT *textObject = orxNULL;
+static orxU32 redFuel = 5000;
+static orxGRAPHIC *textGraphic = orxNULL;
+static orxSTRUCTURE *textStructure = orxNULL;
+static orxTEXT *text = orxNULL;
+static orxFONT *textFont = orxNULL;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -67,6 +74,10 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_IsActive("Thrust"))
   {
+    redFuel--;
+    char fuelStr[20];
+    sprintf(fuelStr, "%u", redFuel);
+    orxText_SetString(text, fuelStr);
     orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
     orxVECTOR currentPosition = orxVECTOR_0;
     orxObject_GetPosition(redShipObject, &currentPosition);
@@ -268,6 +279,11 @@ orxSTATUS orxFASTCALL Init()
   orxObject_Enable(explosionObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
   sunObject = orxObject_CreateFromConfig("SunObject");
+  textObject = orxObject_CreateFromConfig("TextObject");
+  textGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(textObject, GRAPHIC));
+  textStructure = orxGraphic_GetData(textGraphic);
+  text = orxTEXT(textStructure);
+  textFont = orxText_GetFont(text);
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
