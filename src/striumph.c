@@ -34,7 +34,7 @@ static orxFLOAT screenHeight = 0.0f;
 static orxOBJECT *sunObject = orxNULL;
 static orxOBJECT *explosionObject = orxNULL;
 static orxOBJECT *textObject = orxNULL;
-static orxU32 redFuel = 5000;
+static orxU32 redFuel = 100;
 static orxGRAPHIC *textGraphic = orxNULL;
 static orxSTRUCTURE *textStructure = orxNULL;
 static orxTEXT *text = orxNULL;
@@ -94,7 +94,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     orxObject_Enable(redGunObject, orxFALSE);
   }
 
-  if (orxInput_HasBeenDeactivated("Thrust"))
+  if (orxInput_HasBeenDeactivated("Thrust") && redFuel > 0)
   {
     redInertia = true;
   }
@@ -119,7 +119,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     }
   }
 
-  if (orxInput_IsActive("Thrust"))
+  if (orxInput_IsActive("Thrust") && redFuel > 0)
   {
     redFuel--;
     char fuelStr[20];
