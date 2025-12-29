@@ -12,7 +12,6 @@
 #include <time.h>
 #include <math.h>
 
-
 #ifdef __orxMSVC__
 
 /* Requesting high performance dedicated GPU on hybrid laptops */
@@ -42,6 +41,8 @@ static orxTEXT *text = orxNULL;
 static orxFONT *textFont = orxNULL;
 static orxFLOAT radian_min_val = 0.0f;
 static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
+static bool redInertia = false;
+static orxFLOAT inertiaPercentage = 1.0f;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -56,15 +57,15 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_IsActive("AlienShoot"))
   {
-	  orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
-	  orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+    orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+    orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
 
-	  orxObject_SetRotation(sunGunObject, shotRotation);
-          orxObject_Enable(sunGunObject, orxTRUE);
+    orxObject_SetRotation(sunGunObject, shotRotation);
+    orxObject_Enable(sunGunObject, orxTRUE);
   }
   else
   {
-	  orxObject_Enable(sunGunObject, orxFALSE);
+    orxObject_Enable(sunGunObject, orxFALSE);
   }
 
   if (orxInput_IsActive("RotateLeft"))
@@ -91,6 +92,31 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   else
   {
     orxObject_Enable(redGunObject, orxFALSE);
+  }
+
+  if (orxInput_HasBeenDeactivated("Thrust"))
+  {
+    redInertia = true;
+  }
+
+  if (redInertia)
+  {
+    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+    orxFLOAT x = orxMath_Cos(currentRotation);
+    orxFLOAT y = orxMath_Sin(currentRotation);
+    orxVECTOR currentPosition = orxVECTOR_0;
+    orxVECTOR newPosition = orxVECTOR_0;
+    orxObject_GetPosition(redShipObject, &currentPosition);
+    orxVECTOR components = orxVECTOR_0;
+    orxVector_Set(&components, (x * 1.9f) * inertiaPercentage, (y * 1.9f) * inertiaPercentage, 0);
+    orxVector_Add(&newPosition, &components, &currentPosition);
+    orxObject_SetPosition(redShipObject, &newPosition);
+    inertiaPercentage -= 0.02f;
+    if (inertiaPercentage <= 0.0f)
+    {
+      redInertia = false;
+      inertiaPercentage = 1.0f;
+    }
   }
 
   if (orxInput_IsActive("Thrust"))
@@ -166,7 +192,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       orxFLOAT x = orxMath_Cos(currentRotation);
       orxFLOAT y = orxMath_Sin(currentRotation);
       orxVECTOR components = orxVECTOR_0;
-      orxVector_Set(&components, x * 1.9f, y * 1.6f, 0);
+      orxVector_Set(&components, x * 1.9f, y * 1.9f, 0);
 
       orxVector_Add(&newPosition, &components, &currentPosition);
       orxObject_SetPosition(redShipObject, &newPosition);
@@ -325,7 +351,7 @@ orxSTATUS orxFASTCALL Init()
 
   orxVECTOR center = orxVECTOR_0;
 
-  orxOBJECT* star = orxObject_CreateFromConfig("Star");
+  orxOBJECT *star = orxObject_CreateFromConfig("Star");
   orxObject_SetPosition(star, &center);
 
   srand((unsigned int)time(NULL));
