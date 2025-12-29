@@ -29,7 +29,7 @@ ifeq ($(config),debug64)
   ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -m64 -Wno-unused-function -I/usr/local/include/agar -I/usr/include/SDL -D_GNU_SOURCE=1 -D_REENTRANT  -I/usr/include  -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/uuid -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/libpng16
   ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) -ffast-math -g -m64 -fno-exceptions -Wno-unused-function
   ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/dynamic -L. -static-libgcc -static-libstdc++ -m64 -L/usr/lib64 -Wl,-rpath ./ -Wl,--export-dynamic -L/usr/local/lib -lag_gui -lag_core -L/usr/lib/x86_64-linux-gnu -lSDL -lfreetype -lfontconfig -lfreetype -L/usr/local/lib -lGL -lX11 -lXinerama -lm -L/usr/lib -ljpeg -lpng16 -lm -lz -lm -lpthread
+  ALL_LDFLAGS   += $(LDFLAGS) -L$(ORX)/lib/dynamic -L. -static-libgcc -static-libstdc++ -m64 -L/usr/lib64 -Wl,-rpath ./ -Wl,--export-dynamic -L/usr/local/lib -lag_gui -lag_core -L/usr/lib/x86_64-linux-gnu -lfreetype -lfontconfig -lfreetype -L/usr/local/lib -lGL -lX11 -lXinerama -lm -L/usr/lib -ljpeg -lpng16 -lm -lz -lm -lpthread
   LIBS      += -lorxd -ldl -lm -lrt
   LDDEPS    +=
   LINKCMD    = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
