@@ -156,19 +156,16 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
   switch (_pstEvent->eID)
   {
   case orxANIM_EVENT_START:
-    orxLOG("Animation <%s>@<%s> has started!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
     break;
 
   case orxANIM_EVENT_STOP:
-    orxLOG("Animation <%s>@<%s> has stopped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
     break;
 
   case orxANIM_EVENT_CUT:
-    orxLOG("Animation <%s>@<%s> has been cut!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
     break;
 
   case orxANIM_EVENT_LOOP:
-    orxLOG("Animation <%s>@<%s> has looped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
+    // orxLOG("Animation <%s>@<%s> has looped!", pstPayload->zAnimName, orxObject_GetName(orxOBJECT(_pstEvent->hRecipient)));
     if (orxString_Compare(pstPayload->zAnimName, "ExplosionFire") == 0)
     {
       orxObject_Enable(explosionObject, orxFALSE);
@@ -283,6 +280,11 @@ orxSTATUS orxFASTCALL Init()
   // Done!
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
   orxEvent_AddHandler(orxEVENT_TYPE_ANIM, AnimationEventHandler);
+
+  orxVECTOR center = orxVECTOR_0;
+
+  orxOBJECT* star = orxObject_CreateFromConfig("Star");
+  orxObject_SetPosition(star, &center);
   return orxSTATUS_SUCCESS;
 }
 
