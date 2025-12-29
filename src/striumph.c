@@ -34,7 +34,8 @@ static orxFLOAT screenHeight = 0.0f;
 static orxOBJECT *sunObject = orxNULL;
 static orxOBJECT *explosionObject = orxNULL;
 static orxOBJECT *textObject = orxNULL;
-static orxU32 redFuel = 100;
+static orxU32 redFuel = 1000;
+static orxU32 redShots = 100;
 static orxGRAPHIC *textGraphic = orxNULL;
 static orxSTRUCTURE *textStructure = orxNULL;
 static orxTEXT *text = orxNULL;
@@ -43,6 +44,11 @@ static orxFLOAT radian_min_val = 0.0f;
 static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
 static bool redInertia = false;
 static orxFLOAT inertiaPercentage = 1.0f;
+static orxGRAPHIC *shotCountGraphic = orxNULL;
+static orxSTRUCTURE *shotCountStructure = orxNULL;
+static orxTEXT *shotCount = orxNULL;
+static orxFONT *shotCountFont = orxNULL;
+static orxOBJECT *shotCountObject = orxNULL;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -86,12 +92,19 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_IsActive("Shoot"))
   {
-    orxVECTOR v = orxVECTOR_0;
     orxObject_Enable(redGunObject, orxTRUE);
   }
   else
   {
     orxObject_Enable(redGunObject, orxFALSE);
+  }
+
+  if (orxInput_HasBeenDeactivated("Shoot") && redShots > 0)
+  {
+    redShots--;
+    char shotStr[20];
+    sprintf(shotStr, "%u", redShots);
+    orxText_SetString(shotCount, shotStr);
   }
 
   if (orxInput_HasBeenDeactivated("Thrust") && redFuel > 0)
@@ -129,8 +142,6 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     orxVECTOR currentPosition = orxVECTOR_0;
     orxObject_GetPosition(redShipObject, &currentPosition);
     orxVECTOR newPosition = orxVECTOR_0;
-
-    orxFLOAT test = (orxFLOAT)screenHeight;
 
     bool clamp = true;
     bool borderHit = false;
@@ -336,6 +347,12 @@ orxSTATUS orxFASTCALL Init()
   textStructure = orxGraphic_GetData(textGraphic);
   text = orxTEXT(textStructure);
   textFont = orxText_GetFont(text);
+
+  shotCountObject = orxObject_CreateFromConfig("ShotCountObject");
+  shotCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(shotCountObject, GRAPHIC));
+  shotCountStructure = orxGraphic_GetData(shotCountGraphic);
+  shotCount = orxTEXT(shotCountStructure);
+  shotCountFont = orxText_GetFont(shotCount);
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
