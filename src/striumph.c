@@ -8,6 +8,10 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <agar/core.h>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+
 
 #ifdef __orxMSVC__
 
@@ -21,8 +25,10 @@ static orxOBJECT *redShipObject = orxNULL;
 static orxOBJECT *blueShipObject = orxNULL;
 static orxOBJECT *redGunObject = orxNULL;
 static orxOBJECT *blueGunObject = orxNULL;
+static orxOBJECT *sunGunObject = orxNULL;
 static orxSPAWNER *redSpawnerObject = orxNULL;
 static orxSPAWNER *blueSpawnerObject = orxNULL;
+static orxSPAWNER *sunSpawnerObject = orxNULL;
 static orxOBJECT *vMonolithObject = orxNULL;
 static orxFLOAT screenWidth = 0.0f;
 static orxFLOAT screenHeight = 0.0f;
@@ -34,6 +40,8 @@ static orxGRAPHIC *textGraphic = orxNULL;
 static orxSTRUCTURE *textStructure = orxNULL;
 static orxTEXT *text = orxNULL;
 static orxFONT *textFont = orxNULL;
+static orxFLOAT radian_min_val = 0.0f;
+static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -44,6 +52,19 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   {
     // Send close event
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
+  }
+
+  if (orxInput_IsActive("AlienShoot"))
+  {
+	  orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+	  orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+
+	  orxObject_SetRotation(sunGunObject, shotRotation);
+          orxObject_Enable(sunGunObject, orxTRUE);
+  }
+  else
+  {
+	  orxObject_Enable(sunGunObject, orxFALSE);
   }
 
   if (orxInput_IsActive("RotateLeft"))
@@ -273,12 +294,17 @@ orxSTATUS orxFASTCALL Init()
   blueSpawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
   redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
+
+  sunObject = orxObject_CreateFromConfig("SunObject");
+  sunGunObject = (orxOBJECT *)orxObject_GetChild(sunObject);
+  sunSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
+  orxObject_Enable(sunGunObject, orxFALSE);
+
   explosionObject = orxObject_CreateFromConfig("ExplosionObject");
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
   orxObject_Enable(explosionObject, orxFALSE);
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
-  sunObject = orxObject_CreateFromConfig("SunObject");
   textObject = orxObject_CreateFromConfig("TextObject");
   textGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(textObject, GRAPHIC));
   textStructure = orxGraphic_GetData(textGraphic);
@@ -301,6 +327,8 @@ orxSTATUS orxFASTCALL Init()
 
   orxOBJECT* star = orxObject_CreateFromConfig("Star");
   orxObject_SetPosition(star, &center);
+
+  srand((unsigned int)time(NULL));
   return orxSTATUS_SUCCESS;
 }
 
