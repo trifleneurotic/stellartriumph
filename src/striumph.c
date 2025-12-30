@@ -48,12 +48,16 @@ static orxFLOAT radian_min_val = 0.0f;
 static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
 static bool redInertia = false;
 static bool blueHit = false;
+static bool menuTestShowing = false;
+static bool nameObtained = false;
 static orxFLOAT inertiaPercentage = 1.0f;
 static orxGRAPHIC *shotCountGraphic = orxNULL;
 static orxSTRUCTURE *shotCountStructure = orxNULL;
 static orxTEXT *shotCount = orxNULL;
 static orxFONT *shotCountFont = orxNULL;
 static orxOBJECT *shotCountObject = orxNULL;
+static orxOBJECT *sunButton = orxNULL;
+static orxOBJECT *menuTestObject = orxNULL;
 
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -64,6 +68,21 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   {
     // Send close event
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
+  }
+
+  if (menuTestShowing && !nameObtained)
+  {
+	orxVECTOR vPos;
+	orxOBJECT *obj = orxNULL;
+  	if(orxRender_GetWorldPosition(orxMouse_GetPosition(&vPos), orxNULL, &vPos) != orxNULL)
+  	{
+		if(orxInput_HasBeenActivated("Select"))
+		{
+    			obj = orxObject_Pick(&vPos, orxSTRINGID_UNDEFINED);
+			orxLOG("%s", (orxSTRING)orxObject_GetName(obj));
+			nameObtained = true;
+		}
+  	}
   }
 
   if (orxInput_IsActive("AsteroidShoot"))
@@ -112,6 +131,23 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   }
 
   // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
+
+  if (orxInput_HasBeenActivated("MenuTest"))
+  {
+	  orxLOG("Entered MenuTest!");
+	  if (!menuTestShowing)
+	  {
+		  menuTestShowing = true;
+		  orxObject_Enable(sunButton, orxTRUE);
+		  orxObject_Enable(menuTestObject, orxTRUE);
+	  }
+	  else
+	  {
+		  menuTestShowing = false;
+		  orxObject_Enable(sunButton, orxFALSE);
+		  orxObject_Enable(menuTestObject, orxFALSE);
+	  }
+  }
 
   if (orxInput_IsActive("Shoot"))
   {
@@ -373,6 +409,13 @@ orxSTATUS orxFASTCALL Init()
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   asteroidGunObject = (orxOBJECT *)orxObject_GetChild(asteroidShooterObject);
   orxObject_Enable(asteroidGunObject, orxFALSE);
+
+  
+  menuTestObject = orxObject_CreateFromConfig("MenuTest");
+  orxObject_Enable(menuTestObject, orxFALSE);
+  sunButton = orxObject_CreateFromConfig("MenuTestButtonSun");
+  orxObject_Enable(sunButton, orxFALSE);
+
 
   sunObject = orxObject_CreateFromConfig("SunObject");
   sunGunObject = (orxOBJECT *)orxObject_GetChild(sunObject);
