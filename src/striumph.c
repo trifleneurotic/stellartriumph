@@ -50,6 +50,7 @@ static bool redInertia = false;
 static bool blueHit = false;
 static bool menuTestShowing = false;
 static bool nameObtained = false;
+static bool vMonolith = true;
 static orxFLOAT inertiaPercentage = 1.0f;
 static orxGRAPHIC *shotCountGraphic = orxNULL;
 static orxSTRUCTURE *shotCountStructure = orxNULL;
@@ -57,8 +58,36 @@ static orxTEXT *shotCount = orxNULL;
 static orxFONT *shotCountFont = orxNULL;
 static orxOBJECT *shotCountObject = orxNULL;
 static orxOBJECT *sunButton = orxNULL;
+static orxOBJECT *startButton = orxNULL;
+static orxOBJECT *pressedButton = orxNULL;
 static orxOBJECT *menuTestObject = orxNULL;
+static orxSOUND *snd = orxNULL;
 
+void orxFASTCALL GameReset()
+{
+	orxVECTOR redShipStart = orxVECTOR_0;
+	redShipStart.fX = -100;
+	redShipStart.fY = 0;
+	redShipStart.fZ = 0;
+	orxObject_SetPosition(redShipObject, &redShipStart);
+	orxObject_SetRotation(redShipObject, 0.0f);
+
+	if(vMonolith)
+	{
+		orxObject_Enable(vMonolithObject, orxTRUE);
+	}
+	else
+	{
+		orxObject_Enable(vMonolithObject, orxFALSE);
+	}
+	  	  orxLOG("Resetting...");
+		  menuTestShowing = false;
+		  orxObject_Enable(sunButton, orxFALSE);
+		  orxObject_Enable(menuTestObject, orxFALSE);
+		  orxObject_Enable(startButton, orxFALSE);
+
+	orxSound_Play(snd);
+}
 /** Update function, it has been registered to be called every tick of the core clock
  */
 void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
@@ -70,21 +99,45 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     orxEvent_SendShort(orxEVENT_TYPE_SYSTEM, orxSYSTEM_EVENT_CLOSE);
   }
 
-  if (menuTestShowing && !nameObtained)
+  if (menuTestShowing)
   {
 	orxVECTOR vPos;
 	orxOBJECT *obj = orxNULL;
+
+	 if (orxInput_HasBeenActivated("MenuTest"))
+         {
+                  orxLOG("Exiting MenuTest!");
+                  menuTestShowing = false;
+                  orxObject_Enable(sunButton, orxFALSE);
+                  orxObject_Enable(menuTestObject, orxFALSE);
+		  orxObject_Enable(startButton, orxFALSE);
+          }
+         else
+          {
+
   	if(orxRender_GetWorldPosition(orxMouse_GetPosition(&vPos), orxNULL, &vPos) != orxNULL)
   	{
 		if(orxInput_HasBeenActivated("Select"))
 		{
     			obj = orxObject_Pick(&vPos, orxSTRINGID_UNDEFINED);
 			orxLOG("%s", (orxSTRING)orxObject_GetName(obj));
-			nameObtained = true;
+
+			if(orxString_Compare(orxObject_GetName(obj),"MenuTestButtonSun") == 0 || orxString_Compare(orxObject_GetName(obj),"MenuTestButtonPressed") == 0) {
+			if(!vMonolith) {
+  			orxObject_Enable(sunButton, orxFALSE);
+  			orxObject_Enable(pressedButton, orxTRUE);
+			} else {
+  			orxObject_Enable(sunButton, orxTRUE);
+  			orxObject_Enable(pressedButton, orxFALSE);
+			}
+			vMonolith = !vMonolith;
+			} else if ((orxString_Compare(orxObject_GetName(obj),"MenuTestButtonStart") == 0)) {
+				GameReset();
+				}
 		}
   	}
-  }
-
+  }}
+  else {
   if (orxInput_IsActive("AsteroidShoot"))
   {
     orxLOG("Asteroid shooter activated.");
@@ -134,18 +187,21 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (orxInput_HasBeenActivated("MenuTest"))
   {
-	  orxLOG("Entered MenuTest!");
 	  if (!menuTestShowing)
 	  {
+	  	  orxLOG("Entered MenuTest!");
 		  menuTestShowing = true;
 		  orxObject_Enable(sunButton, orxTRUE);
 		  orxObject_Enable(menuTestObject, orxTRUE);
+		  orxObject_Enable(startButton, orxTRUE);
 	  }
 	  else
 	  {
+	  	  orxLOG("Exiting MenuTest!");
 		  menuTestShowing = false;
 		  orxObject_Enable(sunButton, orxFALSE);
 		  orxObject_Enable(menuTestObject, orxFALSE);
+		  orxObject_Enable(startButton, orxFALSE);
 	  }
   }
 
@@ -267,6 +323,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       orxVector_Add(&newPosition, &components, &currentPosition);
       orxObject_SetPosition(redShipObject, &newPosition);
     }
+  }
   }
 }
 
@@ -398,7 +455,8 @@ orxSTATUS orxFASTCALL Init()
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), CameraUpdate, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_LOWER);
 
   // Create the scene
-  orxObject_CreateFromConfig("Sound");
+  snd = orxSound_CreateFromConfig("AppearSound");
+  orxSound_Play(snd);
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   asteroidShooterObject = orxObject_CreateFromConfig("AsteroidShooter");
@@ -415,6 +473,10 @@ orxSTATUS orxFASTCALL Init()
   orxObject_Enable(menuTestObject, orxFALSE);
   sunButton = orxObject_CreateFromConfig("MenuTestButtonSun");
   orxObject_Enable(sunButton, orxFALSE);
+  pressedButton = orxObject_CreateFromConfig("MenuTestButtonPressed");
+  orxObject_Enable(pressedButton, orxFALSE);
+  startButton = orxObject_CreateFromConfig("MenuTestButtonStart");
+  orxObject_Enable(startButton, orxFALSE);
 
 
   sunObject = orxObject_CreateFromConfig("SunObject");
@@ -488,6 +550,8 @@ orxSTATUS orxFASTCALL Bootstrap()
   // Return orxSTATUS_FAILURE to prevent orx from loading the default config file
   return orxSTATUS_SUCCESS;
 }
+
+
 
 /** Main function
  */
