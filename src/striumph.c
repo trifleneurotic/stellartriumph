@@ -21,44 +21,56 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 
 #endif // __orxMSVC__
 
-static orxOBJECT *redShipObject = orxNULL;
-static orxOBJECT *blueShipObject = orxNULL;
-static orxOBJECT *redGunObject = orxNULL;
-static orxOBJECT *blueGunObject = orxNULL;
-static orxOBJECT *sunGunObject = orxNULL;
-static orxOBJECT *asteroidGunObject = orxNULL;
-static orxOBJECT *asteroidShooterObject = orxNULL;
-static orxSPAWNER *redSpawnerObject = orxNULL;
-static orxSPAWNER *blueSpawnerObject = orxNULL;
-static orxSPAWNER *sunSpawnerObject = orxNULL;
-static orxSPAWNER *asteroidSpawnerObject = orxNULL;
-static orxOBJECT *vMonolithObject = orxNULL;
-static orxOBJECT *asteroidObject = orxNULL;
 static orxFLOAT screenWidth = 0.0f;
 static orxFLOAT screenHeight = 0.0f;
-static orxOBJECT *sunObject = orxNULL;
-static orxOBJECT *explosionObject = orxNULL;
-static orxOBJECT *textObject = orxNULL;
-static orxU32 redFuel = 1000;
-static orxU32 redShots = 100;
-static orxGRAPHIC *textGraphic = orxNULL;
-static orxSTRUCTURE *textStructure = orxNULL;
-static orxTEXT *text = orxNULL;
-static orxFONT *textFont = orxNULL;
+
 static orxFLOAT radian_min_val = 0.0f;
 static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
+
 static bool redInertia = false;
 static bool blueHit = false;
 static bool menuTestShowing = false;
 static bool nameObtained = false;
 static bool vMonolith = true;
+
 static orxFLOAT inertiaPercentage = 1.0f;
+
+static orxOBJECT *redShipObject = orxNULL;
+static orxOBJECT *blueShipObject = orxNULL;
+
+static orxOBJECT *redGunObject = orxNULL;
+static orxOBJECT *blueGunObject = orxNULL;
+static orxOBJECT *sunGunObject = orxNULL;
+
+static orxOBJECT *asteroidGunObject = orxNULL;
+static orxOBJECT *asteroidShooterObject = orxNULL;
+
+static orxSPAWNER *redSpawnerObject = orxNULL;
+static orxSPAWNER *blueSpawnerObject = orxNULL;
+static orxSPAWNER *sunSpawnerObject = orxNULL;
+static orxSPAWNER *asteroidSpawnerObject = orxNULL;
+
+static orxOBJECT *vMonolithObject = orxNULL;
+static orxOBJECT *asteroidObject = orxNULL;
+
+static orxOBJECT *sunObject = orxNULL;
+static orxOBJECT *explosionObject = orxNULL;
+static orxOBJECT *fuelCountObject = orxNULL;
+
+static orxU32 redFuel = 1000;
+static orxGRAPHIC *fuelCountGraphic = orxNULL;
+static orxSTRUCTURE *fuelCountStructure = orxNULL;
+static orxTEXT *fuelCount = orxNULL;
+static orxFONT *fuelCountFont = orxNULL;
+
+static orxU32 redShots = 100;
 static orxGRAPHIC *shotCountGraphic = orxNULL;
 static orxSTRUCTURE *shotCountStructure = orxNULL;
 static orxTEXT *shotCount = orxNULL;
 static orxFONT *shotCountFont = orxNULL;
 static orxOBJECT *shotCountObject = orxNULL;
-static orxOBJECT *sunButton = orxNULL;
+
+static orxOBJECT *vMonolithButton = orxNULL;
 static orxOBJECT *startButton = orxNULL;
 static orxOBJECT *pressedButton = orxNULL;
 static orxOBJECT *menuTestObject = orxNULL;
@@ -66,31 +78,34 @@ static orxSOUND *snd = orxNULL;
 
 void orxFASTCALL GameReset()
 {
-	orxVECTOR redShipStart = orxVECTOR_0;
-	redShipStart.fX = -100;
-	redShipStart.fY = 0;
-	redShipStart.fZ = 0;
-	orxObject_SetPosition(redShipObject, &redShipStart);
-	orxObject_SetRotation(redShipObject, 0.0f);
+  orxVECTOR redShipStart = orxVECTOR_0;
+  orxVECTOR newShipSpeed = orxVECTOR_0;
+  redShipStart.fX = -100;
+  redShipStart.fY = 0;
+  redShipStart.fZ = 0;
+  orxObject_SetPosition(redShipObject, &redShipStart);
+  orxObject_SetRotation(redShipObject, 0.0f);
+  orxObject_SetAngularVelocity(redShipObject, 0.0f);
+  orxObject_SetRelativeSpeed(redShipObject, &newShipSpeed);
 
-	if(vMonolith)
-	{
-		orxLOG("Enabling monolith!");
-		orxObject_Enable(vMonolithObject, orxTRUE);
-	}
-	else
-	{
-		orxLOG("Disabling monolith!");
-		orxObject_Enable(vMonolithObject, orxFALSE);
-	}
-	  	  orxLOG("Resetting...");
-		  menuTestShowing = false;
-		  orxObject_Enable(sunButton, orxFALSE);
-		  orxObject_Enable(menuTestObject, orxFALSE);
-		  orxObject_Enable(startButton, orxFALSE);
-		  orxObject_Enable(pressedButton, orxFALSE);
+  if (vMonolith)
+  {
+    orxLOG("Enabling monolith!");
+    orxObject_Enable(vMonolithObject, orxTRUE);
+  }
+  else
+  {
+    orxLOG("Disabling monolith!");
+    orxObject_Enable(vMonolithObject, orxFALSE);
+  }
+  orxLOG("Resetting...");
+  menuTestShowing = false;
+  orxObject_Enable(vMonolithButton, orxFALSE);
+  orxObject_Enable(menuTestObject, orxFALSE);
+  orxObject_Enable(startButton, orxFALSE);
+  orxObject_Enable(pressedButton, orxFALSE);
 
-	orxSound_Play(snd);
+  orxSound_Play(snd);
 }
 /** Update function, it has been registered to be called every tick of the core clock
  */
@@ -105,230 +120,247 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
   if (menuTestShowing)
   {
-	orxVECTOR vPos;
-	orxOBJECT *obj = orxNULL;
+    orxVECTOR vPos;
+    orxOBJECT *obj = orxNULL;
 
-	 if (orxInput_HasBeenActivated("MenuTest"))
-         {
-                  orxLOG("Exiting MenuTest!");
-                  menuTestShowing = false;
-                  orxObject_Enable(sunButton, orxFALSE);
-                  orxObject_Enable(menuTestObject, orxFALSE);
-		  orxObject_Enable(startButton, orxFALSE);
-		  orxObject_Enable(pressedButton, orxFALSE);
-          }
-         else
+    if (orxInput_HasBeenActivated("MenuTest"))
+    {
+      orxLOG("Exiting MenuTest!");
+      menuTestShowing = false;
+      orxObject_Enable(vMonolithButton, orxFALSE);
+      orxObject_Enable(menuTestObject, orxFALSE);
+      orxObject_Enable(startButton, orxFALSE);
+      orxObject_Enable(pressedButton, orxFALSE);
+    }
+    else
+    {
+      if (orxRender_GetWorldPosition(orxMouse_GetPosition(&vPos), orxNULL, &vPos) != orxNULL)
+      {
+        if (orxInput_HasBeenActivated("Select"))
+        {
+          obj = orxObject_Pick(&vPos, orxSTRINGID_UNDEFINED);
+          orxLOG("%s", (orxSTRING)orxObject_GetName(obj));
+
+          if (orxString_Compare(orxObject_GetName(obj), "MenuTestButtonVMonolith") == 0 || orxString_Compare(orxObject_GetName(obj), "MenuTestButtonPressed") == 0)
           {
-
-  	if(orxRender_GetWorldPosition(orxMouse_GetPosition(&vPos), orxNULL, &vPos) != orxNULL)
-  	{
-		if(orxInput_HasBeenActivated("Select"))
-		{
-    			obj = orxObject_Pick(&vPos, orxSTRINGID_UNDEFINED);
-			orxLOG("%s", (orxSTRING)orxObject_GetName(obj));
-
-			if(orxString_Compare(orxObject_GetName(obj),"MenuTestButtonSun") == 0 || orxString_Compare(orxObject_GetName(obj),"MenuTestButtonPressed") == 0) {
-			if(!vMonolith) {
-  			orxObject_Enable(sunButton, orxFALSE);
-  			orxObject_Enable(pressedButton, orxTRUE);
-			} else {
-  			orxObject_Enable(sunButton, orxTRUE);
-  			orxObject_Enable(pressedButton, orxFALSE);
-			}
-			vMonolith = !vMonolith;
-			} else if ((orxString_Compare(orxObject_GetName(obj),"MenuTestButtonStart") == 0)) {
-				GameReset();
-				}
-		}
-  	}
-  }}
-  else {
-  if (orxInput_IsActive("AsteroidShoot"))
-  {
-    orxLOG("Asteroid shooter activated.");
-    orxVECTOR asteroidShooterPosition = orxVECTOR_0;
-    asteroidShooterPosition.fX = 100;
-    asteroidShooterPosition.fY = 100;
-    asteroidShooterPosition.fZ = 0;
-    orxObject_SetPosition(asteroidShooterObject, &asteroidShooterPosition);
-    orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
-    orxFLOAT asteroidGunRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
-
-    orxObject_SetRotation(asteroidGunObject, asteroidGunRotation);
-    orxObject_Enable(asteroidGunObject, orxTRUE);
+            if (!vMonolith)
+            {
+              orxObject_Enable(vMonolithButton, orxFALSE);
+              orxObject_Enable(pressedButton, orxTRUE);
+            }
+            else
+            {
+              orxObject_Enable(vMonolithButton, orxTRUE);
+              orxObject_Enable(pressedButton, orxFALSE);
+            }
+            vMonolith = !vMonolith;
+          }
+          else if ((orxString_Compare(orxObject_GetName(obj), "MenuTestButtonStart") == 0))
+          {
+            GameReset();
+          }
+        }
+      }
+    }
   }
   else
   {
-    orxObject_Enable(asteroidGunObject, orxFALSE);
-  }
-
-  if (orxInput_IsActive("AlienShoot"))
-  {
-    orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
-    orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
-
-    orxObject_SetRotation(sunGunObject, shotRotation);
-    orxObject_Enable(sunGunObject, orxTRUE);
-  }
-  else
-  {
-    orxObject_Enable(sunGunObject, orxFALSE);
-  }
-  if (orxInput_IsActive("RotateLeft"))
-  {
-    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-    orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-    orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
-  }
-
-  if (orxInput_IsActive("RotateRight"))
-  {
-    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-    orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
-    orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
-  }
-
-  // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
-
-  if (orxInput_HasBeenActivated("MenuTest"))
-  {
-	  if (!menuTestShowing)
-	  {
-	  	  orxLOG("Entered MenuTest!");
-		  menuTestShowing = true;
-		  orxObject_Enable(sunButton, orxTRUE);
-		  orxObject_Enable(menuTestObject, orxTRUE);
-		  orxObject_Enable(startButton, orxTRUE);
-	  }
-	  else
-	  {
-	  	  orxLOG("Exiting MenuTest!");
-		  menuTestShowing = false;
-		  orxObject_Enable(sunButton, orxFALSE);
-		  orxObject_Enable(menuTestObject, orxFALSE);
-		  orxObject_Enable(startButton, orxFALSE);
-	  }
-  }
-
-  if (orxInput_IsActive("Shoot"))
-  {
-    orxObject_Enable(redGunObject, orxTRUE);
-  }
-  else
-  {
-    orxObject_Enable(redGunObject, orxFALSE);
-  }
-
-  if (orxInput_HasBeenDeactivated("Shoot") && redShots > 0)
-  {
-    redShots--;
-    char shotStr[20];
-    sprintf(shotStr, "%u", redShots);
-    orxText_SetString(shotCount, shotStr);
-  }
-
-  if (orxInput_HasBeenDeactivated("Thrust") && redFuel > 0)
-  {
-    redInertia = true;
-  }
-
-  if (redInertia)
-  {
-    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-    orxFLOAT x = orxMath_Cos(currentRotation);
-    orxFLOAT y = orxMath_Sin(currentRotation);
-    orxVECTOR currentPosition = orxVECTOR_0;
-    orxVECTOR newPosition = orxVECTOR_0;
-    orxObject_GetPosition(redShipObject, &currentPosition);
-    orxVECTOR components = orxVECTOR_0;
-    orxVector_Set(&components, (x * 1.9f) * inertiaPercentage, (y * 1.9f) * inertiaPercentage, 0);
-    orxVector_Add(&newPosition, &components, &currentPosition);
-    orxObject_SetPosition(redShipObject, &newPosition);
-    inertiaPercentage -= 0.02f;
-    if (inertiaPercentage <= 0.0f)
+    if (orxInput_IsActive("AsteroidShoot"))
     {
-      redInertia = false;
-      inertiaPercentage = 1.0f;
+      orxLOG("Asteroid shooter activated.");
+      orxVECTOR asteroidShooterPosition = orxVECTOR_0;
+      asteroidShooterPosition.fX = 100;
+      asteroidShooterPosition.fY = 100;
+      asteroidShooterPosition.fZ = 0;
+      orxObject_SetPosition(asteroidShooterObject, &asteroidShooterPosition);
+      orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+      orxFLOAT asteroidGunRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+
+      orxObject_SetRotation(asteroidGunObject, asteroidGunRotation);
+      orxObject_Enable(asteroidGunObject, orxTRUE);
     }
-  }
-
-  if (orxInput_IsActive("Thrust") && redFuel > 0)
-  {
-    redFuel--;
-    char fuelStr[20];
-    sprintf(fuelStr, "%u", redFuel);
-    orxText_SetString(text, fuelStr);
-    orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
-    orxVECTOR currentPosition = orxVECTOR_0;
-    orxObject_GetPosition(redShipObject, &currentPosition);
-    orxVECTOR newPosition = orxVECTOR_0;
-
-    bool clamp = true;
-    bool borderHit = false;
-
-    // Check and wrap horizontally
-    if (currentPosition.fX < -screenWidth / 2.0f)
+    else
     {
-      if (!clamp)
+      orxObject_Enable(asteroidGunObject, orxFALSE);
+    }
+
+    if (orxInput_IsActive("AlienShoot"))
+    {
+      orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+      orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+
+      orxObject_SetRotation(sunGunObject, shotRotation);
+      orxObject_Enable(sunGunObject, orxTRUE);
+    }
+    else
+    {
+      orxObject_Enable(sunGunObject, orxFALSE);
+    }
+
+    if (orxInput_IsActive("RotateLeft"))
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+      orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+      orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
+    }
+
+    if (orxInput_IsActive("RotateRight"))
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+      orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+      orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
+    }
+
+    // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
+
+    if (orxInput_HasBeenActivated("MenuTest"))
+    {
+      if (!menuTestShowing)
       {
-        currentPosition.fX += screenWidth; // Move to the right side
-        borderHit = true;
+        orxLOG("Entered MenuTest!");
+        menuTestShowing = true;
+        if(vMonolith)
+        {
+          orxObject_Enable(pressedButton, orxTRUE);
+        }
+        else
+        {
+          orxObject_Enable(vMonolithButton, 	orxTRUE);
+        }
+        orxObject_Enable(vMonolithButton, orxTRUE);
+        orxObject_Enable(menuTestObject, orxTRUE);
+        orxObject_Enable(startButton, orxTRUE);
       }
       else
       {
-        currentPosition.fX += 2.3f;
-      }
-    }
-    else if (currentPosition.fX > screenWidth / 2.0f)
-    {
-      if (!clamp)
-      {
-        currentPosition.fX -= screenWidth; // Move to the left side
-        borderHit = true;
-      }
-      else
-      {
-        currentPosition.fX -= 2.3f;
+        orxLOG("Exiting MenuTest!");
+        menuTestShowing = false;
+        orxObject_Enable(vMonolithButton, orxFALSE);
+        orxObject_Enable(menuTestObject, orxFALSE);
+        orxObject_Enable(startButton, orxFALSE);
+        orxObject_Enable(pressedButton, orxFALSE);
       }
     }
 
-    // Check and wrap vertically (adjust for your game's Y-axis orientation)
-    if (currentPosition.fY < -screenHeight / 2.0f)
+    if (orxInput_IsActive("Shoot") && redShots > 0)
     {
-      if (!clamp)
-      {
-        currentPosition.fY += screenHeight; // Move to the bottom
-        borderHit = true;
-      }
-      else
-      {
-        currentPosition.fY += 2.3f; // bounce ship off edge
-      }
+      orxObject_Enable(redGunObject, orxTRUE);
     }
-    else if (currentPosition.fY > screenHeight / 2.0f)
+    else
     {
-      if (!clamp)
-      {
-        currentPosition.fY -= screenHeight; // Move to the top
-        borderHit = true;
-      }
-      else
-      {
-        currentPosition.fY -= 2.3f;
-      }
+      orxObject_Enable(redGunObject, orxFALSE);
     }
 
-    if ((!clamp && borderHit) || !borderHit)
+    if (orxInput_HasBeenDeactivated("Shoot") && redShots > 0)
     {
+      redShots--;
+      char shotStr[20];
+      sprintf(shotStr, "%u", redShots);
+      orxText_SetString(shotCount, shotStr);
+    }
+
+    if (orxInput_HasBeenDeactivated("Thrust") && redFuel > 0)
+    {
+      redInertia = true;
+    }
+
+    if (redInertia)
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
       orxFLOAT x = orxMath_Cos(currentRotation);
       orxFLOAT y = orxMath_Sin(currentRotation);
+      orxVECTOR currentPosition = orxVECTOR_0;
+      orxVECTOR newPosition = orxVECTOR_0;
+      orxObject_GetPosition(redShipObject, &currentPosition);
       orxVECTOR components = orxVECTOR_0;
-      orxVector_Set(&components, x * 1.9f, y * 1.9f, 0);
-
+      orxVector_Set(&components, (x * 1.9f) * inertiaPercentage, (y * 1.9f) * inertiaPercentage, 0);
       orxVector_Add(&newPosition, &components, &currentPosition);
       orxObject_SetPosition(redShipObject, &newPosition);
+      inertiaPercentage -= 0.02f;
+      if (inertiaPercentage <= 0.0f)
+      {
+        redInertia = false;
+        inertiaPercentage = 1.0f;
+      }
     }
-  }
+
+    if (orxInput_IsActive("Thrust") && redFuel > 0)
+    {
+      redFuel--;
+      char fuelStr[20];
+      sprintf(fuelStr, "%u", redFuel);
+      orxText_SetString(fuelCount, fuelStr);
+      orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
+      orxVECTOR currentPosition = orxVECTOR_0;
+      orxObject_GetPosition(redShipObject, &currentPosition);
+      orxVECTOR newPosition = orxVECTOR_0;
+
+      bool clamp = true;
+      bool borderHit = false;
+
+      // Check and wrap horizontally
+      if (currentPosition.fX < -screenWidth / 2.0f)
+      {
+        if (!clamp)
+        {
+          currentPosition.fX += screenWidth; // Move to the right side
+          borderHit = true;
+        }
+        else
+        {
+          currentPosition.fX += 2.3f;
+        }
+      }
+      else if (currentPosition.fX > screenWidth / 2.0f)
+      {
+        if (!clamp)
+        {
+          currentPosition.fX -= screenWidth; // Move to the left side
+          borderHit = true;
+        }
+        else
+        {
+          currentPosition.fX -= 2.3f;
+        }
+      }
+
+      // Check and wrap vertically (adjust for your game's Y-axis orientation)
+      if (currentPosition.fY < -screenHeight / 2.0f)
+      {
+        if (!clamp)
+        {
+          currentPosition.fY += screenHeight; // Move to the bottom
+          borderHit = true;
+        }
+        else
+        {
+          currentPosition.fY += 2.3f; // bounce ship off edge
+        }
+      }
+      else if (currentPosition.fY > screenHeight / 2.0f)
+      {
+        if (!clamp)
+        {
+          currentPosition.fY -= screenHeight; // Move to the top
+          borderHit = true;
+        }
+        else
+        {
+          currentPosition.fY -= 2.3f;
+        }
+      }
+
+      if ((!clamp && borderHit) || !borderHit)
+      {
+        orxFLOAT x = orxMath_Cos(currentRotation);
+        orxFLOAT y = orxMath_Sin(currentRotation);
+        orxVECTOR components = orxVECTOR_0;
+        orxVector_Set(&components, x * 1.9f, y * 1.9f, 0);
+
+        orxVector_Add(&newPosition, &components, &currentPosition);
+        orxObject_SetPosition(redShipObject, &newPosition);
+      }
+    }
   }
 }
 
@@ -360,11 +392,11 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
       orxObject_Enable(explosionObject, orxFALSE);
       if (blueHit)
       {
-      orxObject_SetPosition(blueShipObject, &newShipPos);
-      orxObject_SetRelativeSpeed(blueShipObject, &newShipSpeed);
-      orxObject_SetAngularVelocity(blueShipObject, 0.0f);
-      orxObject_Enable(blueShipObject, orxTRUE);
-      blueHit = false;
+        orxObject_SetPosition(blueShipObject, &newShipPos);
+        orxObject_SetRelativeSpeed(blueShipObject, &newShipSpeed);
+        orxObject_SetAngularVelocity(blueShipObject, 0.0f);
+        orxObject_Enable(blueShipObject, orxTRUE);
+        blueHit = false;
       }
     }
     break;
@@ -413,7 +445,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
         orxObject_SetPosition(explosionObject, &vContactPoint);
         orxObject_Enable(explosionObject, orxTRUE);
         orxObject_Enable(blueShipObject, orxFALSE);
-	blueHit = true;
+        blueHit = true;
       }
     }
   }
@@ -430,10 +462,6 @@ void orxFASTCALL CameraUpdate(const orxCLOCK_INFO *_pstClockInfo, void *_pContex
   orxConfig_PopSection();
   if (pstMainCamera)
   {
-    // Update & move the camera here
-    // [...]
-
-    // Round its position
     orxVECTOR vPosition;
     orxObject_SetPosition(pstMainCamera, orxVector_Round(&vPosition, orxObject_GetPosition(pstMainCamera, &vPosition)));
   }
@@ -461,27 +489,30 @@ orxSTATUS orxFASTCALL Init()
 
   // Create the scene
   snd = orxSound_CreateFromConfig("AppearSound");
+
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   asteroidShooterObject = orxObject_CreateFromConfig("AsteroidShooter");
+
   redSpawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
   blueSpawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
   asteroidSpawnerObject = orxSpawner_CreateFromConfig("AsteroidSpawner");
+
   redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   asteroidGunObject = (orxOBJECT *)orxObject_GetChild(asteroidShooterObject);
   orxObject_Enable(asteroidGunObject, orxFALSE);
+  orxObject_Enable(redGunObject, orxFALSE);
+  orxObject_Enable(blueGunObject, orxFALSE);
 
-  
   menuTestObject = orxObject_CreateFromConfig("MenuTest");
   orxObject_Enable(menuTestObject, orxFALSE);
-  sunButton = orxObject_CreateFromConfig("MenuTestButtonSun");
-  orxObject_Enable(sunButton, orxFALSE);
+  vMonolithButton = orxObject_CreateFromConfig("MenuTestButtonVMonolith");
+  orxObject_Enable(vMonolithButton, orxFALSE);
   pressedButton = orxObject_CreateFromConfig("MenuTestButtonPressed");
   orxObject_Enable(pressedButton, orxFALSE);
   startButton = orxObject_CreateFromConfig("MenuTestButtonStart");
   orxObject_Enable(startButton, orxFALSE);
-
 
   sunObject = orxObject_CreateFromConfig("SunObject");
   sunGunObject = (orxOBJECT *)orxObject_GetChild(sunObject);
@@ -489,15 +520,15 @@ orxSTATUS orxFASTCALL Init()
   orxObject_Enable(sunGunObject, orxFALSE);
 
   explosionObject = orxObject_CreateFromConfig("ExplosionObject");
-  orxObject_Enable(redGunObject, orxFALSE);
-  orxObject_Enable(blueGunObject, orxFALSE);
   orxObject_Enable(explosionObject, orxFALSE);
+
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
-  textObject = orxObject_CreateFromConfig("TextObject");
-  textGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(textObject, GRAPHIC));
-  textStructure = orxGraphic_GetData(textGraphic);
-  text = orxTEXT(textStructure);
-  textFont = orxText_GetFont(text);
+
+  fuelCountObject = orxObject_CreateFromConfig("FuelCountObject");
+  fuelCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(fuelCountObject, GRAPHIC));
+  fuelCountStructure = orxGraphic_GetData(fuelCountGraphic);
+  fuelCount = orxTEXT(fuelCountStructure);
+  fuelCountFont = orxText_GetFont(fuelCount);
 
   shotCountObject = orxObject_CreateFromConfig("ShotCountObject");
   shotCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(shotCountObject, GRAPHIC));
@@ -555,8 +586,6 @@ orxSTATUS orxFASTCALL Bootstrap()
   // Return orxSTATUS_FAILURE to prevent orx from loading the default config file
   return orxSTATUS_SUCCESS;
 }
-
-
 
 /** Main function
  */
