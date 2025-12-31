@@ -7,6 +7,7 @@
 #include "orxExtensions.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdbool.h>
 #include <agar/core.h>
 #include <stdlib.h>
 #include <time.h>
@@ -74,10 +75,12 @@ void orxFASTCALL GameReset()
 
 	if(vMonolith)
 	{
+		orxLOG("Enabling monolith!");
 		orxObject_Enable(vMonolithObject, orxTRUE);
 	}
 	else
 	{
+		orxLOG("Disabling monolith!");
 		orxObject_Enable(vMonolithObject, orxFALSE);
 	}
 	  	  orxLOG("Resetting...");
@@ -85,6 +88,7 @@ void orxFASTCALL GameReset()
 		  orxObject_Enable(sunButton, orxFALSE);
 		  orxObject_Enable(menuTestObject, orxFALSE);
 		  orxObject_Enable(startButton, orxFALSE);
+		  orxObject_Enable(pressedButton, orxFALSE);
 
 	orxSound_Play(snd);
 }
@@ -111,6 +115,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
                   orxObject_Enable(sunButton, orxFALSE);
                   orxObject_Enable(menuTestObject, orxFALSE);
 		  orxObject_Enable(startButton, orxFALSE);
+		  orxObject_Enable(pressedButton, orxFALSE);
           }
          else
           {
@@ -456,7 +461,6 @@ orxSTATUS orxFASTCALL Init()
 
   // Create the scene
   snd = orxSound_CreateFromConfig("AppearSound");
-  orxSound_Play(snd);
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   asteroidShooterObject = orxObject_CreateFromConfig("AsteroidShooter");
@@ -519,6 +523,7 @@ orxSTATUS orxFASTCALL Init()
   orxObject_SetPosition(star, &center);
 
   srand((unsigned int)time(NULL));
+  orxSound_Play(snd);
   return orxSTATUS_SUCCESS;
 }
 
