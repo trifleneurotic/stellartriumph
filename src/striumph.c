@@ -32,22 +32,24 @@ static bool blueHit = false;
 static bool menuTestShowing = false;
 static bool nameObtained = false;
 static bool vMonolith = true;
+static bool alienEnabled = false;
 
 static orxFLOAT inertiaPercentage = 1.0f;
 
 static orxOBJECT *redShipObject = orxNULL;
 static orxOBJECT *blueShipObject = orxNULL;
+static orxOBJECT *alienObject = orxNULL;
 
 static orxOBJECT *redGunObject = orxNULL;
 static orxOBJECT *blueGunObject = orxNULL;
-static orxOBJECT *sunGunObject = orxNULL;
+static orxOBJECT *alienGunObject = orxNULL;
 
 static orxOBJECT *asteroidGunObject = orxNULL;
 static orxOBJECT *asteroidShooterObject = orxNULL;
 
 static orxSPAWNER *redSpawnerObject = orxNULL;
 static orxSPAWNER *blueSpawnerObject = orxNULL;
-static orxSPAWNER *sunSpawnerObject = orxNULL;
+static orxSPAWNER *alienSpawnerObject = orxNULL;
 static orxSPAWNER *asteroidSpawnerObject = orxNULL;
 
 static orxOBJECT *vMonolithObject = orxNULL;
@@ -184,17 +186,53 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       orxObject_Enable(asteroidGunObject, orxFALSE);
     }
 
-    if (orxInput_IsActive("AlienShoot"))
+    if (orxInput_HasBeenActivated("SpawnAlien") && !alienEnabled)
     {
-      orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
-      orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+      orxLOG("Alien spawned.");
+      // unsigned int yPosition = rand() % (unsigned int)(screenHeight) - (unsigned int)(screenHeight / 2.0f);
+      orxVECTOR alienPosition = orxVECTOR_0;
+      alienPosition.fX = screenWidth / 2.0f + 50.0f;
+      alienPosition.fY = 100.0f;
+      alienPosition.fZ = 0;
+      orxVECTOR alienSpeed = orxVECTOR_0;
+      alienSpeed.fX = -200.0f;
+      alienSpeed.fY = 0.0f;
+      alienSpeed.fZ = 0.0f;
+      orxObject_SetRelativeSpeed(alienObject, &alienSpeed);
+      orxObject_SetPosition(alienObject, &alienPosition);
+      orxObject_Enable(alienObject, orxTRUE);
+      alienEnabled = true;
+    }
 
-      orxObject_SetRotation(sunGunObject, shotRotation);
-      orxObject_Enable(sunGunObject, orxTRUE);
+    if (alienEnabled)
+    {
+      orxVECTOR alienPosition = orxVECTOR_0;
+      orxObject_GetPosition(alienObject, &alienPosition);
+      if (alienPosition.fX < -screenWidth / 2.0f - 50.0f)
+      {
+        orxObject_Enable(alienObject, orxFALSE);
+        alienEnabled = false;
+      }
+
+      orxFLOAT alienShotChance = fabs(_pstClockInfo->fTime - nearbyintf(_pstClockInfo->fTime));
+
+      if (alienShotChance > 0.4f)
+      {
+        orxLOG("Alien shooter activated.");
+        orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+        orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+
+        orxObject_SetRotation(alienGunObject, shotRotation);
+        orxObject_Enable(alienGunObject, orxTRUE);
+      }
+      else
+      {
+        orxObject_Enable(alienGunObject, orxFALSE);
+      }
     }
     else
     {
-      orxObject_Enable(sunGunObject, orxFALSE);
+      orxObject_Enable(alienGunObject, orxFALSE);
     }
 
     if (orxInput_IsActive("RotateLeft"))
@@ -219,13 +257,13 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       {
         orxLOG("Entered MenuTest!");
         menuTestShowing = true;
-        if(vMonolith)
+        if (vMonolith)
         {
           orxObject_Enable(pressedButton, orxTRUE);
         }
         else
         {
-          orxObject_Enable(vMonolithButton, 	orxTRUE);
+          orxObject_Enable(vMonolithButton, orxTRUE);
         }
         orxObject_Enable(vMonolithButton, orxTRUE);
         orxObject_Enable(menuTestObject, orxTRUE);
@@ -493,17 +531,22 @@ orxSTATUS orxFASTCALL Init()
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   asteroidShooterObject = orxObject_CreateFromConfig("AsteroidShooter");
+  alienObject = orxObject_CreateFromConfig("Alien");
+  orxObject_Enable(alienObject, orxFALSE);
 
   redSpawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
   blueSpawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
   asteroidSpawnerObject = orxSpawner_CreateFromConfig("AsteroidSpawner");
+  alienSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
 
   redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   asteroidGunObject = (orxOBJECT *)orxObject_GetChild(asteroidShooterObject);
+  alienGunObject = (orxOBJECT *)orxObject_GetChild(alienObject);
   orxObject_Enable(asteroidGunObject, orxFALSE);
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
+  orxObject_Enable(alienGunObject, orxFALSE);
 
   menuTestObject = orxObject_CreateFromConfig("MenuTest");
   orxObject_Enable(menuTestObject, orxFALSE);
@@ -515,9 +558,8 @@ orxSTATUS orxFASTCALL Init()
   orxObject_Enable(startButton, orxFALSE);
 
   sunObject = orxObject_CreateFromConfig("SunObject");
-  sunGunObject = (orxOBJECT *)orxObject_GetChild(sunObject);
-  sunSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
-  orxObject_Enable(sunGunObject, orxFALSE);
+
+  alienSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
 
   explosionObject = orxObject_CreateFromConfig("ExplosionObject");
   orxObject_Enable(explosionObject, orxFALSE);
