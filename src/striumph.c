@@ -78,6 +78,9 @@ static orxOBJECT *pressedButton = orxNULL;
 static orxOBJECT *menuTestObject = orxNULL;
 static orxSOUND *snd = orxNULL;
 
+static orxU32 screenWidthInt = 0;
+static orxU32 screenHeightInt = 0;
+
 void orxFASTCALL GameReset()
 {
   orxVECTOR redShipStart = orxVECTOR_0;
@@ -167,7 +170,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   }
   else
   {
-    if (orxInput_IsActive("AsteroidShoot"))
+    /*if (orxInput_IsActive("AsteroidShoot"))
     {
       orxLOG("Asteroid shooter activated.");
       orxVECTOR asteroidShooterPosition = orxVECTOR_0;
@@ -184,7 +187,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
     else
     {
       orxObject_Enable(asteroidGunObject, orxFALSE);
-    }
+    }*/
 
     if (orxInput_HasBeenActivated("SpawnAlien") && !alienEnabled)
     {
@@ -402,6 +405,69 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   }
 }
 
+orxSTATUS orxFASTCALL SpawnerEventHandler(const orxEVENT *_pstEvent)
+{
+  if (_pstEvent->eID == orxSPAWNER_EVENT_SPAWN)
+  {
+    orxSPAWNER *pstSpawner;
+    orxOBJECT *pstSpawnedObject;
+    pstSpawner = (orxSPAWNER *)_pstEvent->hSender;
+    pstSpawnedObject = (orxOBJECT *)_pstEvent->hRecipient;
+    orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSpawnedObject);
+    orxLOG("%s", senderObjectName);
+    if (orxString_Compare(senderObjectName, "Asteroid") == 0)
+    {
+      orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+      orxFLOAT asteroidRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+      orxObject_SetRotation(pstSpawnedObject, asteroidRotation);
+
+      orxVECTOR currentPosition = orxVECTOR_0;
+      orxObject_GetPosition(asteroidShooterObject, &currentPosition);
+      orxVECTOR newPosition = orxVECTOR_0;
+
+      if(currentPosition.fX < 0 && currentPosition.fY > 0)
+      {
+         newPosition.fX = currentPosition.fX - 50.0f;
+         newPosition.fY = -currentPosition.fY - 50.0f;
+         orxLOG("Spawning asteroid in bottom left");
+         orxLOG("Current position: %f, %f", currentPosition.fX, currentPosition.fY);
+         orxLOG("New position: %f, %f", newPosition.fX, newPosition.fY);
+      }
+      else if(currentPosition.fX < 0 && currentPosition.fY < 0)
+      {
+         newPosition.fX = -currentPosition.fX - 50.0f;
+         newPosition.fY = currentPosition.fY - 50.0f;
+         orxLOG("Spawning asteroid in top left");
+         orxLOG("Current position: %f, %f", currentPosition.fX, currentPosition.fY);
+         orxLOG("New position: %f, %f", newPosition.fX, newPosition.fY);
+      }
+      else if(currentPosition.fX > 0 && currentPosition.fY < 0)
+      {
+         newPosition.fX = currentPosition.fX - 50.0f;
+         newPosition.fY = -currentPosition.fY - 50.0f;
+         orxLOG("Spawning asteroid in top right");
+         orxLOG("Current position: %f, %f", currentPosition.fX, currentPosition.fY);
+         orxLOG("New position: %f, %f", newPosition.fX, newPosition.fY);
+      }
+      else
+      {
+         newPosition.fX = -currentPosition.fX - 50.0f;
+         newPosition.fY = currentPosition.fY - 50.0f;
+         orxLOG("Spawning asteroid in bottom right");
+         orxLOG("Current position: %f, %f", currentPosition.fX, currentPosition.fY);
+         orxLOG("New position: %f, %f", newPosition.fX, newPosition.fY);
+      }
+
+      orxObject_SetPosition(asteroidShooterObject, &newPosition);
+      scale = (orxFLOAT)rand() / RAND_MAX;
+      orxFLOAT asteroidGunRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+      orxObject_SetRotation(asteroidGunObject, asteroidGunRotation);
+
+     }
+  return orxSTATUS_SUCCESS;
+}
+}
+
 orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
 {
   orxANIM_EVENT_PAYLOAD *pstPayload;
@@ -543,7 +609,25 @@ orxSTATUS orxFASTCALL Init()
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   asteroidGunObject = (orxOBJECT *)orxObject_GetChild(asteroidShooterObject);
   alienGunObject = (orxOBJECT *)orxObject_GetChild(alienObject);
-  orxObject_Enable(asteroidGunObject, orxFALSE);
+
+  orxDISPLAY_VIDEO_MODE videoMode;
+  /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
+  orxDisplay_GetVideoMode(orxU32_UNDEFINED, &videoMode);
+
+  /* The width can then be accessed */
+  screenWidth = (orxFLOAT)videoMode.u32Width;
+  screenHeight = (orxFLOAT)videoMode.u32Height;
+
+  orxVECTOR asteroidShooterPosition = orxVECTOR_0;
+  asteroidShooterPosition.fX = screenWidth / 2.0f - 50.0f;
+  asteroidShooterPosition.fY = -screenHeight / 2.0f + 50.0f;
+  asteroidShooterPosition.fZ = 0;
+  orxObject_SetPosition(asteroidShooterObject, &asteroidShooterPosition);
+  orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
+  orxFLOAT asteroidGunRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
+  orxObject_SetRotation(asteroidGunObject, asteroidGunRotation);
+
+  orxObject_Enable(asteroidGunObject, orxTRUE);
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
   orxObject_Enable(alienGunObject, orxFALSE);
@@ -578,17 +662,12 @@ orxSTATUS orxFASTCALL Init()
   shotCount = orxTEXT(shotCountStructure);
   shotCountFont = orxText_GetFont(shotCount);
 
-  orxDISPLAY_VIDEO_MODE videoMode;
-  /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
-  orxDisplay_GetVideoMode(orxU32_UNDEFINED, &videoMode);
 
-  /* The width can then be accessed */
-  screenWidth = (orxFLOAT)videoMode.u32Width;
-  screenHeight = (orxFLOAT)videoMode.u32Height;
 
   // Done!
   orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, PhysicsEventHandler);
   orxEvent_AddHandler(orxEVENT_TYPE_ANIM, AnimationEventHandler);
+  orxEvent_AddHandler(orxEVENT_TYPE_SPAWNER, SpawnerEventHandler);
 
   orxVECTOR center = orxVECTOR_0;
 
@@ -596,7 +675,7 @@ orxSTATUS orxFASTCALL Init()
   orxObject_SetPosition(star, &center);
 
   srand((unsigned int)time(NULL));
-  orxSound_Play(snd);
+  /* orxSound_Play(snd); */
   return orxSTATUS_SUCCESS;
 }
 
