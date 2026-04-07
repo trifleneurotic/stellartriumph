@@ -571,6 +571,20 @@ void orxFASTCALL CameraUpdate(const orxCLOCK_INFO *_pstClockInfo, void *_pContex
   }
 }
 
+void orxFASTCALL InputCheck(const orxCLOCK_INFO *_pstClockInfo, void *_pstContext)
+{
+	orxINPUT_TYPE inputType;
+	orxENUM buttonAxisOrKeyID;
+	orxFLOAT value;
+	orxINPUT_MODE mode = orxINPUT_MODE_FULL;
+ 
+	if (orxInput_GetActiveBinding(&inputType, &buttonAxisOrKeyID, &value)) 
+	{
+		const orxSTRING pressedInputName = orxInput_GetBindingName(inputType, buttonAxisOrKeyID, mode);
+		orxLOG("Input: %s, Type: %d, ID: %d, Value %f", pressedInputName, inputType, buttonAxisOrKeyID, value);
+	}
+}
+
 /** Init function, it is called when all orx's modules have been initialized
  */
 orxSTATUS orxFASTCALL Init()
@@ -590,6 +604,8 @@ orxSTATUS orxFASTCALL Init()
   // Register the Update & CameraUpdate functions to the core clock
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), Update, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
   orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), CameraUpdate, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_LOWER);
+
+  orxClock_Register(orxClock_Get(orxCLOCK_KZ_CORE), InputCheck, orxNULL, orxMODULE_ID_MAIN, orxCLOCK_PRIORITY_NORMAL);
 
   // Create the scene
   snd = orxSound_CreateFromConfig("AppearSound");
