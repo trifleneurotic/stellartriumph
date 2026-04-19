@@ -211,7 +211,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
 
       if (alienPosition.fX < -screenWidth / 2.0f - 50.0f)
       {
-        orxObject_Enable(alienObject, orxFALSE);
+        //orxObject_Enable(alienObject, orxFALSE);
         alienEnabled = false;
 
         orxObject_Enable(alienGunObject, orxFALSE);
