@@ -27,7 +27,9 @@ static orxFLOAT radian_min_val = 0.0f;
 static orxFLOAT radian_max_val = orxMATH_KF_PI_BY_2 * 3.0f;
 
 static bool redInertia = false;
+static bool blueInertia = false;
 static bool blueHit = false;
+static bool redHit = false;
 static bool menuTestShowing = false;
 static bool nameObtained = false;
 static bool vMonolith = true;
@@ -46,9 +48,13 @@ static orxOBJECT *alienGunObject = orxNULL;
 static orxOBJECT *asteroidGunObject = orxNULL;
 static orxOBJECT *asteroidShooterObject = orxNULL;
 
+static orxOBJECT *alienShipGunObject = orxNULL;
+static orxOBJECT *alienShipShooterObject = orxNULL;
+
 static orxSPAWNER *redSpawnerObject = orxNULL;
 static orxSPAWNER *blueSpawnerObject = orxNULL;
 static orxSPAWNER *alienSpawnerObject = orxNULL;
+static orxSPAWNER *alienShipSpawnerObject = orxNULL;
 static orxSPAWNER *asteroidSpawnerObject = orxNULL;
 
 static orxOBJECT *vMonolithObject = orxNULL;
@@ -56,20 +62,34 @@ static orxOBJECT *asteroidObject = orxNULL;
 
 static orxOBJECT *sunObject = orxNULL;
 static orxOBJECT *explosionObject = orxNULL;
-static orxOBJECT *fuelCountObject = orxNULL;
+static orxOBJECT *redFuelCountObject = orxNULL;
+static orxOBJECT *blueFuelCountObject = orxNULL;
 
 static orxU32 redFuel = 1000;
-static orxGRAPHIC *fuelCountGraphic = orxNULL;
-static orxSTRUCTURE *fuelCountStructure = orxNULL;
-static orxTEXT *fuelCount = orxNULL;
-static orxFONT *fuelCountFont = orxNULL;
+static orxGRAPHIC *redFuelCountGraphic = orxNULL;
+static orxSTRUCTURE *redFuelCountStructure = orxNULL;
+static orxTEXT *redFuelCount = orxNULL;
+static orxFONT *redFuelCountFont = orxNULL;
+
+static orxU32 blueFuel = 1000;
+static orxGRAPHIC *blueFuelCountGraphic = orxNULL;
+static orxSTRUCTURE *blueFuelCountStructure = orxNULL;
+static orxTEXT *blueFuelCount = orxNULL;
+static orxFONT *blueFuelCountFont = orxNULL;
 
 static orxU32 redShots = 100;
-static orxGRAPHIC *shotCountGraphic = orxNULL;
-static orxSTRUCTURE *shotCountStructure = orxNULL;
-static orxTEXT *shotCount = orxNULL;
-static orxFONT *shotCountFont = orxNULL;
-static orxOBJECT *shotCountObject = orxNULL;
+static orxGRAPHIC *redShotCountGraphic = orxNULL;
+static orxSTRUCTURE *redShotCountStructure = orxNULL;
+static orxTEXT *redShotCount = orxNULL;
+static orxFONT *redShotCountFont = orxNULL;
+static orxOBJECT *redShotCountObject = orxNULL;
+
+static orxU32 blueShots = 100;
+static orxGRAPHIC *blueShotCountGraphic = orxNULL;
+static orxSTRUCTURE *blueShotCountStructure = orxNULL;
+static orxTEXT *blueShotCount = orxNULL;
+static orxFONT *blueShotCountFont = orxNULL;
+static orxOBJECT *blueShotCountObject = orxNULL;
 
 static orxOBJECT *vMonolithButton = orxNULL;
 static orxOBJECT *startButton = orxNULL;
@@ -83,14 +103,24 @@ static orxU32 screenHeightInt = 0;
 void orxFASTCALL GameReset()
 {
   orxVECTOR redShipStart = orxVECTOR_0;
-  orxVECTOR newShipSpeed = orxVECTOR_0;
+  orxVECTOR redNewShipSpeed = orxVECTOR_0;
   redShipStart.fX = -100;
   redShipStart.fY = 0;
   redShipStart.fZ = 0;
   orxObject_SetPosition(redShipObject, &redShipStart);
   orxObject_SetRotation(redShipObject, 0.0f);
   orxObject_SetAngularVelocity(redShipObject, 0.0f);
-  orxObject_SetRelativeSpeed(redShipObject, &newShipSpeed);
+  orxObject_SetRelativeSpeed(redShipObject, &redNewShipSpeed);
+
+  orxVECTOR blueShipStart = orxVECTOR_0;
+  orxVECTOR blueNewShipSpeed = orxVECTOR_0;
+  blueShipStart.fX = -300;
+  blueShipStart.fY = 0;
+  blueShipStart.fZ = 0;
+  orxObject_SetPosition(blueShipObject, &blueShipStart);
+  orxObject_SetRotation(blueShipObject, 0.0f);
+  orxObject_SetAngularVelocity(blueShipObject, 0.0f);
+  orxObject_SetRelativeSpeed(blueShipObject, &blueNewShipSpeed);
 
   if (vMonolith)
   {
@@ -169,51 +199,24 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
   }
   else
   {
-    /*if (orxInput_IsActive("AsteroidShoot"))
-    {
-      orxLOG("Asteroid shooter activated.");
-      orxVECTOR asteroidShooterPosition = orxVECTOR_0;
-      asteroidShooterPosition.fX = 100;
-      asteroidShooterPosition.fY = 100;
-      asteroidShooterPosition.fZ = 0;
-      orxObject_SetPosition(asteroidShooterObject, &asteroidShooterPosition);
-      orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
-      orxFLOAT asteroidGunRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
-
-      orxObject_SetRotation(asteroidGunObject, asteroidGunRotation);
-      orxObject_Enable(asteroidGunObject, orxTRUE);
-    }
-    else
-    {
-      orxObject_Enable(asteroidGunObject, orxFALSE);
-    }*/
-
-    if (orxInput_HasBeenActivated("SpawnAlien") && !alienEnabled)
-    {
-      orxLOG("Alien spawned.");
-      // unsigned int yPosition = rand() % (unsigned int)(screenHeight) - (unsigned int)(screenHeight / 2.0f);
-      orxVECTOR alienPosition = orxVECTOR_0;
-      alienPosition.fX = screenWidth / 2.0f + 50.0f;
-      alienPosition.fY = 100.0f;
-      alienPosition.fZ = 0;
-      orxVECTOR alienSpeed = orxVECTOR_0;
-      alienSpeed.fX = -200.0f;
-      alienSpeed.fY = 0.0f;
-      alienSpeed.fZ = 0.0f;
-      orxObject_SetRelativeSpeed(alienObject, &alienSpeed);
-      orxObject_SetPosition(alienObject, &alienPosition);
-      orxObject_Enable(alienObject, orxTRUE);
-      alienEnabled = true;
-    }
-
     if (alienEnabled)
     {
       orxVECTOR alienPosition = orxVECTOR_0;
       orxObject_GetPosition(alienObject, &alienPosition);
+
+      if(alienGunObject == orxNULL)
+      {
+        alienGunObject = orxObject_CreateFromConfig("AlienGun");
+      }
+
       if (alienPosition.fX < -screenWidth / 2.0f - 50.0f)
       {
         orxObject_Enable(alienObject, orxFALSE);
         alienEnabled = false;
+
+        orxObject_Enable(alienGunObject, orxFALSE);
+        alienGunObject = orxNULL;
+        orxLOG("Alien left the screen. Disabling alien and alien gun.");
       }
 
       orxFLOAT alienShotChance = fabs(_pstClockInfo->fTime - nearbyintf(_pstClockInfo->fTime));
@@ -224,31 +227,55 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
         orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
         orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
 
+        orxObject_SetPosition(alienGunObject, &alienPosition);
         orxObject_SetRotation(alienGunObject, shotRotation);
         orxObject_Enable(alienGunObject, orxTRUE);
       }
       else
       {
-        orxObject_Enable(alienGunObject, orxFALSE);
+        if(alienGunObject != orxNULL)
+        {
+          orxObject_Enable(alienGunObject, orxFALSE);
+        }
       }
+
     }
     else
     {
+      if( alienGunObject != orxNULL)
       orxObject_Enable(alienGunObject, orxFALSE);
     }
 
-    if (orxInput_IsActive("RotateLeft"))
+    if (orxInput_IsActive("RedRotateLeft"))
     {
       orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
       orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
       orxObject_SetRotation(redShipObject, currentRotation - rotationChange);
+      orxLOG("Red Rotate Left active. Current rotation: %f", orxObject_GetRotation(redShipObject));
     }
 
-    if (orxInput_IsActive("RotateRight"))
+    if (orxInput_IsActive("RedRotateRight"))
     {
       orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
       orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
       orxObject_SetRotation(redShipObject, currentRotation + rotationChange);
+      orxLOG("Red Rotate Right active. Current rotation: %f", orxObject_GetRotation(redShipObject));
+    }
+
+    if (orxInput_IsActive("BlueRotateLeft"))
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(blueShipObject);
+      orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+      orxObject_SetRotation(blueShipObject, currentRotation - rotationChange);
+      orxLOG("Blue Rotate Left active. Current rotation: %f", orxObject_GetRotation(blueShipObject));
+    }
+
+    if (orxInput_IsActive("BlueRotateRight"))
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(blueShipObject);
+      orxFLOAT rotationChange = (0.08f + _pstClockInfo->fDT) - (_pstClockInfo->fDT / orxMATH_KF_2_PI);
+      orxObject_SetRotation(blueShipObject, currentRotation + rotationChange);
+      orxLOG("Blue Rotate Right active. Current rotation: %f", orxObject_GetRotation(blueShipObject));
     }
 
     // TODO: Variables for shot include rate, speed, longevity, gravity, bounce
@@ -282,7 +309,7 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       }
     }
 
-    if (orxInput_IsActive("Shoot") && redShots > 0)
+    if (orxInput_IsActive("RedShoot") && redShots > 0)
     {
       orxObject_Enable(redGunObject, orxTRUE);
     }
@@ -291,17 +318,39 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       orxObject_Enable(redGunObject, orxFALSE);
     }
 
-    if (orxInput_HasBeenDeactivated("Shoot") && redShots > 0)
+    if (orxInput_IsActive("BlueShoot") && blueShots > 0)
+    {
+      orxObject_Enable(blueGunObject, orxTRUE);
+    }
+    else
+    {
+      orxObject_Enable(blueGunObject, orxFALSE);
+    }
+
+    if (orxInput_HasBeenDeactivated("RedShoot") && redShots > 0)
     {
       redShots--;
       char shotStr[20];
       sprintf(shotStr, "%u", redShots);
-      orxText_SetString(shotCount, shotStr);
+      orxText_SetString(redShotCount, shotStr);
     }
 
-    if (orxInput_HasBeenDeactivated("Thrust") && redFuel > 0)
+    if (orxInput_HasBeenDeactivated("BlueShoot") && blueShots > 0)
+    {
+      blueShots--;
+      char shotStr[20];
+      sprintf(shotStr, "%u", blueShots);
+      orxText_SetString(blueShotCount, shotStr);
+    }
+
+    if (orxInput_HasBeenDeactivated("RedThrust") && redFuel > 0)
     {
       redInertia = true;
+    }
+
+    if (orxInput_HasBeenDeactivated("BlueThrust") && blueFuel > 0)
+    {
+      blueInertia = true;
     }
 
     if (redInertia)
@@ -324,12 +373,32 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       }
     }
 
-    if (orxInput_IsActive("Thrust") && redFuel > 0)
+    if (blueInertia)
+    {
+      orxFLOAT currentRotation = orxObject_GetRotation(blueShipObject);
+      orxFLOAT x = orxMath_Cos(currentRotation);
+      orxFLOAT y = orxMath_Sin(currentRotation);
+      orxVECTOR currentPosition = orxVECTOR_0;
+      orxVECTOR newPosition = orxVECTOR_0;
+      orxObject_GetPosition(blueShipObject, &currentPosition);
+      orxVECTOR components = orxVECTOR_0;
+      orxVector_Set(&components, (x * 1.9f) * inertiaPercentage, (y * 1.9f) * inertiaPercentage, 0);
+      orxVector_Add(&newPosition, &components, &currentPosition);
+      orxObject_SetPosition(blueShipObject, &newPosition);
+      inertiaPercentage -= 0.02f;
+      if (inertiaPercentage <= 0.0f)
+      {
+        blueInertia = false;
+        inertiaPercentage = 1.0f;
+      }
+    }
+
+    if (orxInput_IsActive("RedThrust") && redFuel > 0)
     {
       redFuel--;
       char fuelStr[20];
       sprintf(fuelStr, "%u", redFuel);
-      orxText_SetString(fuelCount, fuelStr);
+      orxText_SetString(redFuelCount, fuelStr);
       orxFLOAT currentRotation = orxObject_GetRotation(redShipObject);
       orxVECTOR currentPosition = orxVECTOR_0;
       orxObject_GetPosition(redShipObject, &currentPosition);
@@ -397,8 +466,90 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
         orxVECTOR components = orxVECTOR_0;
         orxVector_Set(&components, x * 1.9f, y * 1.9f, 0);
 
+        orxLOG("Red thrust active. Current rotation: %f, components: %f, %f", currentRotation, components.fX, components.fY);
+
         orxVector_Add(&newPosition, &components, &currentPosition);
         orxObject_SetPosition(redShipObject, &newPosition);
+      }
+    }
+
+    if (orxInput_IsActive("BlueThrust") && blueFuel > 0)
+    {
+      blueFuel--;
+      char fuelStr[20];
+      sprintf(fuelStr, "%u", blueFuel);
+      orxText_SetString(blueFuelCount, fuelStr);
+      orxFLOAT blueCurrentRotation = orxObject_GetRotation(blueShipObject);
+      orxVECTOR blueCurrentPosition = orxVECTOR_0;
+      orxObject_GetPosition(blueShipObject, &blueCurrentPosition);
+      orxVECTOR blueNewPosition = orxVECTOR_0;
+
+      bool clamp = true;
+      bool borderHit = false;
+
+      // Check and wrap horizontally
+      if (blueCurrentPosition.fX < -screenWidth / 2.0f)
+      {
+        if (!clamp)
+        {
+          blueCurrentPosition.fX += screenWidth; // Move to the right side
+          borderHit = true;
+        }
+        else
+        {
+          blueCurrentPosition.fX += 2.3f;
+        }
+      }
+      else if (blueCurrentPosition.fX > screenWidth / 2.0f)
+      {
+        if (!clamp)
+        {
+          blueCurrentPosition.fX -= screenWidth; // Move to the left side
+          borderHit = true;
+        }
+        else
+        {
+          blueCurrentPosition.fX -= 2.3f;
+        }
+      }
+
+      // Check and wrap vertically (adjust for your game's Y-axis orientation)
+      if (blueCurrentPosition.fY < -screenHeight / 2.0f)
+      {
+        if (!clamp)
+        {
+          blueCurrentPosition.fY += screenHeight; // Move to the bottom
+          borderHit = true;
+        }
+        else
+        {
+          blueCurrentPosition.fY += 2.3f; // bounce ship off edge
+        }
+      }
+      else if (blueCurrentPosition.fY > screenHeight / 2.0f)
+      {
+        if (!clamp)
+        {
+          blueCurrentPosition.fY -= screenHeight; // Move to the top
+          borderHit = true;
+        }
+        else
+        {
+          blueCurrentPosition.fY -= 2.3f;
+        }
+      }
+
+      if ((!clamp && borderHit) || !borderHit)
+      {
+        orxFLOAT x = orxMath_Cos(blueCurrentRotation);
+        orxFLOAT y = orxMath_Sin(blueCurrentRotation);
+        orxVECTOR components = orxVECTOR_0;
+        orxVector_Set(&components, x * 1.9f, y * 1.9f, 0);
+
+          orxLOG("Blue thrust active. Current rotation: %f, components: %f, %f", blueCurrentRotation, components.fX, components.fY);
+
+        orxVector_Add(&blueNewPosition, &components, &blueCurrentPosition);
+        orxObject_SetPosition(blueShipObject, &blueNewPosition);
       }
     }
   }
@@ -414,6 +565,24 @@ orxSTATUS orxFASTCALL SpawnerEventHandler(const orxEVENT *_pstEvent)
     pstSpawnedObject = (orxOBJECT *)_pstEvent->hRecipient;
     orxSTRING senderObjectName = (orxSTRING)orxObject_GetName(pstSpawnedObject);
     orxLOG("%s", senderObjectName);
+    if (orxString_Compare(senderObjectName, "Alien") == 0)
+    {
+      orxLOG("Alien spawned.");
+      // unsigned int yPosition = rand() % (unsigned int)(screenHeight) - (unsigned int)(screenHeight / 2.0f);
+      orxVECTOR alienPosition = orxVECTOR_0;
+      alienPosition.fX = screenWidth / 2.0f + 50.0f;
+      alienPosition.fY = 100.0f;
+      alienPosition.fZ = 0;
+      orxVECTOR alienSpeed = orxVECTOR_0;
+      alienSpeed.fX = -200.0f;
+      alienSpeed.fY = 0.0f;
+      alienSpeed.fZ = 0.0f;
+      orxObject_SetRelativeSpeed(pstSpawnedObject, &alienSpeed);
+      orxObject_SetPosition(pstSpawnedObject, &alienPosition);
+      orxObject_Enable(pstSpawnedObject, orxTRUE);
+      alienObject = pstSpawnedObject;
+      alienEnabled = true;
+    }
     if (orxString_Compare(senderObjectName, "Asteroid") == 0)
     {
       orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
@@ -501,6 +670,16 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
         orxObject_Enable(blueShipObject, orxTRUE);
         blueHit = false;
       }
+
+      orxObject_Enable(explosionObject, orxFALSE);
+      if (redHit)
+      {
+        orxObject_SetPosition(redShipObject, &newShipPos);
+        orxObject_SetRelativeSpeed(redShipObject, &newShipSpeed);
+        orxObject_SetAngularVelocity(redShipObject, 0.0f);
+        orxObject_Enable(redShipObject, orxTRUE);
+        redHit = false;
+      }
     }
     break;
   }
@@ -539,9 +718,48 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
 
-    if (orxString_Compare(senderObjectName, "Blue") == 0)
+    if (orxString_Compare(senderObjectName, "Blue") == 0 && !orxInput_IsActive("BlueShoot"))
     {
       if (orxString_Compare(recipientObjectName, "Shot") == 0)
+      {
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(blueShipObject, orxFALSE);
+        blueHit = true;
+      }
+    }
+
+    if (orxString_Compare(senderObjectName, "Red") == 0 && !orxInput_IsActive("RedShoot"))
+    {
+      if (orxString_Compare(recipientObjectName, "Shot") == 0)
+      {
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
+      }
+    }
+
+     if (orxString_Compare(senderObjectName, "Red") == 0)
+    {
+      if (orxString_Compare(recipientObjectName, "Asteroid") == 0)
+      {
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
+      }
+    }
+
+     if (orxString_Compare(senderObjectName, "Blue") == 0)
+    {
+      if (orxString_Compare(recipientObjectName, "Asteroid") == 0)
       {
         orxObject_SetLifeTime(pstRecipientObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
@@ -576,11 +794,11 @@ void orxFASTCALL InputCheck(const orxCLOCK_INFO *_pstClockInfo, void *_pstContex
 	orxENUM buttonAxisOrKeyID;
 	orxFLOAT value;
 	orxINPUT_MODE mode = orxINPUT_MODE_FULL;
- 
-	if (orxInput_GetActiveBinding(&inputType, &buttonAxisOrKeyID, &value)) 
+
+	if (orxInput_GetActiveBinding(&inputType, &buttonAxisOrKeyID, &value))
 	{
 		const orxSTRING pressedInputName = orxInput_GetBindingName(inputType, buttonAxisOrKeyID, mode);
-		orxLOG("Input: %s, Type: %d, ID: %d, Value %f", pressedInputName, inputType, buttonAxisOrKeyID, value);
+		//orxLOG("Input: %s, Type: %d, ID: %d, Value %f", pressedInputName, inputType, buttonAxisOrKeyID, value);
 	}
 }
 
@@ -612,18 +830,18 @@ orxSTATUS orxFASTCALL Init()
   redShipObject = orxObject_CreateFromConfig("Red");
   blueShipObject = orxObject_CreateFromConfig("Blue");
   asteroidShooterObject = orxObject_CreateFromConfig("AsteroidShooter");
-  alienObject = orxObject_CreateFromConfig("Alien");
-  orxObject_Enable(alienObject, orxFALSE);
+  alienShipShooterObject = orxObject_CreateFromConfig("AlienShipShooter");
 
   redSpawnerObject = orxSpawner_CreateFromConfig("RedShotSpawner");
   blueSpawnerObject = orxSpawner_CreateFromConfig("BlueShotSpawner");
   asteroidSpawnerObject = orxSpawner_CreateFromConfig("AsteroidSpawner");
   alienSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
+  alienShipSpawnerObject = orxSpawner_CreateFromConfig("AlienShipSpawner");
 
   redGunObject = (orxOBJECT *)orxObject_GetChild(redShipObject);
   blueGunObject = (orxOBJECT *)orxObject_GetChild(blueShipObject);
   asteroidGunObject = (orxOBJECT *)orxObject_GetChild(asteroidShooterObject);
-  alienGunObject = (orxOBJECT *)orxObject_GetChild(alienObject);
+  alienShipGunObject = (orxOBJECT *)orxObject_GetChild(alienShipShooterObject);
 
   orxDISPLAY_VIDEO_MODE videoMode;
   /* Passing orxU32_UNDEFINED as the index retrieves the current desktop video mode */
@@ -645,7 +863,7 @@ orxSTATUS orxFASTCALL Init()
   orxObject_Enable(asteroidGunObject, orxTRUE);
   orxObject_Enable(redGunObject, orxFALSE);
   orxObject_Enable(blueGunObject, orxFALSE);
-  orxObject_Enable(alienGunObject, orxFALSE);
+  orxObject_Enable(alienShipGunObject, orxTRUE);
 
   menuTestObject = orxObject_CreateFromConfig("MenuTest");
   orxObject_Enable(menuTestObject, orxFALSE);
@@ -658,25 +876,34 @@ orxSTATUS orxFASTCALL Init()
 
   sunObject = orxObject_CreateFromConfig("SunObject");
 
-  alienSpawnerObject = orxSpawner_CreateFromConfig("AlienShotSpawner");
-
   explosionObject = orxObject_CreateFromConfig("ExplosionObject");
   orxObject_Enable(explosionObject, orxFALSE);
 
   vMonolithObject = orxObject_CreateFromConfig("VMonolith");
 
-  fuelCountObject = orxObject_CreateFromConfig("FuelCountObject");
-  fuelCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(fuelCountObject, GRAPHIC));
-  fuelCountStructure = orxGraphic_GetData(fuelCountGraphic);
-  fuelCount = orxTEXT(fuelCountStructure);
-  fuelCountFont = orxText_GetFont(fuelCount);
+  redFuelCountObject = orxObject_CreateFromConfig("RedFuelCountObject");
+  redFuelCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(redFuelCountObject, GRAPHIC));
+  redFuelCountStructure = orxGraphic_GetData(redFuelCountGraphic);
+  redFuelCount = orxTEXT(redFuelCountStructure);
+  redFuelCountFont = orxText_GetFont(redFuelCount);
 
-  shotCountObject = orxObject_CreateFromConfig("ShotCountObject");
-  shotCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(shotCountObject, GRAPHIC));
-  shotCountStructure = orxGraphic_GetData(shotCountGraphic);
-  shotCount = orxTEXT(shotCountStructure);
-  shotCountFont = orxText_GetFont(shotCount);
+  blueFuelCountObject = orxObject_CreateFromConfig("BlueFuelCountObject");
+  blueFuelCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(blueFuelCountObject, GRAPHIC));
+  blueFuelCountStructure = orxGraphic_GetData(blueFuelCountGraphic);
+  blueFuelCount = orxTEXT(blueFuelCountStructure);
+  blueFuelCountFont = orxText_GetFont(blueFuelCount);
 
+  redShotCountObject = orxObject_CreateFromConfig("RedShotCountObject");
+  redShotCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(redShotCountObject, GRAPHIC));
+  redShotCountStructure = orxGraphic_GetData(redShotCountGraphic);
+  redShotCount = orxTEXT(redShotCountStructure);
+  redShotCountFont = orxText_GetFont(redShotCount);
+
+  blueShotCountObject = orxObject_CreateFromConfig("BlueShotCountObject");
+  blueShotCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(blueShotCountObject, GRAPHIC));
+  blueShotCountStructure = orxGraphic_GetData(blueShotCountGraphic);
+  blueShotCount = orxTEXT(blueShotCountStructure);
+  blueShotCountFont = orxText_GetFont(blueShotCount);
 
 
   // Done!
@@ -690,7 +917,7 @@ orxSTATUS orxFASTCALL Init()
   orxObject_SetPosition(star, &center);
 
   srand((unsigned int)time(NULL));
-  /* orxSound_Play(snd); */
+  orxSound_Play(snd);
   return orxSTATUS_SUCCESS;
 }
 
