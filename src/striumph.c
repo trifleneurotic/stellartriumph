@@ -204,32 +204,25 @@ void orxFASTCALL Update(const orxCLOCK_INFO *_pstClockInfo, void *_pContext)
       orxVECTOR alienPosition = orxVECTOR_0;
       orxObject_GetPosition(alienObject, &alienPosition);
 
-      if(alienGunObject == orxNULL)
-      {
-        alienGunObject = orxObject_CreateFromConfig("AlienGun");
-      }
-
       if (alienPosition.fX < -screenWidth / 2.0f - 50.0f)
       {
-        //orxObject_Enable(alienObject, orxFALSE);
         alienEnabled = false;
-
-        orxObject_Enable(alienGunObject, orxFALSE);
-        alienGunObject = orxNULL;
-        orxLOG("Alien left the screen. Disabling alien and alien gun.");
       }
 
       orxFLOAT alienShotChance = fabs(_pstClockInfo->fTime - nearbyintf(_pstClockInfo->fTime));
 
-      if (alienShotChance > 0.4f)
+      if (alienShotChance > 0.44f)
       {
         orxLOG("Alien shooter activated.");
         orxFLOAT scale = (orxFLOAT)rand() / RAND_MAX;
         orxFLOAT shotRotation = radian_min_val + scale * (radian_max_val - radian_min_val);
 
+
         orxObject_SetPosition(alienGunObject, &alienPosition);
         orxObject_SetRotation(alienGunObject, shotRotation);
-        orxObject_Enable(alienGunObject, orxTRUE);
+         orxObject_Enable(alienGunObject, orxTRUE);
+
+
       }
       else
       {
@@ -581,6 +574,12 @@ orxSTATUS orxFASTCALL SpawnerEventHandler(const orxEVENT *_pstEvent)
       orxObject_SetPosition(pstSpawnedObject, &alienPosition);
       orxObject_Enable(pstSpawnedObject, orxTRUE);
       alienObject = pstSpawnedObject;
+      if(alienGunObject == orxNULL)
+      {
+        alienGunObject = orxObject_CreateFromConfig("AlienGun");
+        orxObject_SetPosition(alienGunObject, &alienPosition);
+        orxObject_Enable(alienGunObject, orxTRUE);
+      }
       alienEnabled = true;
     }
     if (orxString_Compare(senderObjectName, "Asteroid") == 0)
@@ -744,16 +743,20 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
 
-     if (orxString_Compare(senderObjectName, "Red") == 0)
+    if (orxString_Compare(senderObjectName, "Alien") == 0 && !orxObject_IsEnabled(alienGunObject))
     {
-      if (orxString_Compare(recipientObjectName, "Asteroid") == 0)
+      if (orxString_Compare(recipientObjectName, "Shot") == 0)
       {
+        orxLOG("Alien hit by shot.");
         orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_SetLifeTime(pstSenderObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
         orxObject_SetPosition(explosionObject, &vContactPoint);
         orxObject_Enable(explosionObject, orxTRUE);
-        orxObject_Enable(redShipObject, orxFALSE);
-        redHit = true;
+        orxObject_Enable(alienGunObject, orxFALSE);
+        orxObject_Enable(alienObject, orxFALSE);
+        alienEnabled = false;
+
       }
     }
 
@@ -767,6 +770,19 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
         orxObject_Enable(explosionObject, orxTRUE);
         orxObject_Enable(blueShipObject, orxFALSE);
         blueHit = true;
+      }
+    }
+
+     if (orxString_Compare(senderObjectName, "Red") == 0)
+    {
+      if (orxString_Compare(recipientObjectName, "Asteroid") == 0)
+      {
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
       }
     }
   }
