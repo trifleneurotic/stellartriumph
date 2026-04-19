@@ -663,11 +663,14 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
       orxObject_Enable(explosionObject, orxFALSE);
       if (blueHit)
       {
+        orxLOG("Respawning blue ship.");
         orxObject_SetPosition(blueShipObject, &newShipPos);
         orxObject_SetRelativeSpeed(blueShipObject, &newShipSpeed);
         orxObject_SetAngularVelocity(blueShipObject, 0.0f);
         orxObject_Enable(blueShipObject, orxTRUE);
         blueHit = false;
+        orxLOG("Blue ship position: %f, %f", newShipPos.fX, newShipPos.fY);
+
       }
 
       orxObject_Enable(explosionObject, orxFALSE);
@@ -717,10 +720,11 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
 
-    if (orxString_Compare(senderObjectName, "Blue") == 0 && !orxInput_IsActive("BlueShoot"))
+    if ((orxString_Compare(senderObjectName, "Blue") == 0 || orxString_Compare(senderObjectName, "Shot") == 0) && !orxInput_IsActive("BlueShoot"))
     {
-      if (orxString_Compare(recipientObjectName, "Shot") == 0)
+      if (orxString_Compare(recipientObjectName, "Shot") == 0 || orxString_Compare(recipientObjectName, "Blue") == 0)
       {
+        orxLOG("Blue hit by shot. EXPLODING");
         orxObject_SetLifeTime(pstRecipientObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
         orxObject_SetPosition(explosionObject, &vContactPoint);
@@ -786,6 +790,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
   }
+
   return orxSTATUS_SUCCESS;
 }
 
