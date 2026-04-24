@@ -30,6 +30,8 @@ static bool redInertia = false;
 static bool blueInertia = false;
 static bool blueHit = false;
 static bool redHit = false;
+static bool blueShot = false;
+static bool redShot = false;
 static bool menuTestShowing = false;
 static bool nameObtained = false;
 static bool vMonolith = true;
@@ -64,6 +66,9 @@ static orxOBJECT *sunObject = orxNULL;
 static orxOBJECT *explosionObject = orxNULL;
 static orxOBJECT *redFuelCountObject = orxNULL;
 static orxOBJECT *blueFuelCountObject = orxNULL;
+static orxOBJECT *redKillCountObject = orxNULL;
+static orxOBJECT *blueKillCountObject = orxNULL;
+
 
 static orxU32 redFuel = 1000;
 static orxGRAPHIC *redFuelCountGraphic = orxNULL;
@@ -96,6 +101,21 @@ static orxOBJECT *startButton = orxNULL;
 static orxOBJECT *pressedButton = orxNULL;
 static orxOBJECT *menuTestObject = orxNULL;
 static orxSOUND *snd = orxNULL;
+
+
+static orxU32 redKills = 0;
+static orxGRAPHIC *redKillCountGraphic = orxNULL;
+static orxSTRUCTURE *redKillCountStructure = orxNULL;
+static orxTEXT *redKillCount = orxNULL;
+static orxFONT *redKillCountFont = orxNULL;
+
+
+static orxU32 blueKills = 0;
+static orxGRAPHIC *blueKillCountGraphic = orxNULL;
+static orxSTRUCTURE *blueKillCountStructure = orxNULL;
+static orxTEXT *blueKillCount = orxNULL;
+static orxFONT *blueKillCountFont = orxNULL;
+
 
 static orxU32 screenWidthInt = 0;
 static orxU32 screenHeightInt = 0;
@@ -663,6 +683,14 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
       orxObject_Enable(explosionObject, orxFALSE);
       if (blueHit)
       {
+        if(blueShot)
+        {
+          blueShot = false;
+          redKills++;
+          char redKillStr[20];
+      sprintf(redKillStr, "%u", redKills);
+      orxText_SetString(redKillCount, redKillStr);
+        }
         orxLOG("Respawning blue ship.");
         orxObject_SetPosition(blueShipObject, &newShipPos);
         orxObject_SetRelativeSpeed(blueShipObject, &newShipSpeed);
@@ -676,6 +704,14 @@ orxSTATUS orxFASTCALL AnimationEventHandler(const orxEVENT *_pstEvent)
       orxObject_Enable(explosionObject, orxFALSE);
       if (redHit)
       {
+        if(redShot)
+        {
+          redShot = false;
+          blueKills++;
+          char blueKillStr[20];
+      sprintf(blueKillStr, "%u", blueKills);
+      orxText_SetString(blueKillCount, blueKillStr);
+        }
         orxObject_SetPosition(redShipObject, &newShipPos);
         orxObject_SetRelativeSpeed(redShipObject, &newShipSpeed);
         orxObject_SetAngularVelocity(redShipObject, 0.0f);
@@ -710,7 +746,7 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
 
     if (orxString_Compare(senderObjectName, "Asteroid") == 0)
     {
-      if (orxString_Compare(recipientObjectName, "Shot") == 0)
+      if (orxString_Compare(recipientObjectName, "Shot") == 0 || orxString_Compare(recipientObjectName, "RedShot") == 0 || orxString_Compare(recipientObjectName, "BlueShot") == 0)
       {
         orxObject_SetLifeTime(pstRecipientObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
@@ -720,21 +756,64 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
 
-    if ((orxString_Compare(senderObjectName, "Blue") == 0 || orxString_Compare(senderObjectName, "Shot") == 0) && !orxInput_IsActive("BlueShoot"))
+    if (orxString_Compare(senderObjectName, "Red") == 0)
     {
-      if (orxString_Compare(recipientObjectName, "Shot") == 0 || orxString_Compare(recipientObjectName, "Blue") == 0)
+      if (orxString_Compare(recipientObjectName, "BlueShot") == 0)
       {
-        orxLOG("Blue hit by shot. EXPLODING");
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
+        redShot = true;
+      }
+    }
+
+    if (orxString_Compare(recipientObjectName, "Red") == 0)
+    {
+      if (orxString_Compare(senderObjectName, "BlueShot") == 0)
+      {
+        orxObject_SetLifeTime(pstSenderObject, 0);
+        orxObject_GetPosition(pstSenderObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
+        redShot = true;
+      }
+    }
+
+    if (orxString_Compare(senderObjectName, "Blue") == 0)
+    {
+      if (orxString_Compare(recipientObjectName, "RedShot") == 0)
+      {
         orxObject_SetLifeTime(pstRecipientObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
         orxObject_SetPosition(explosionObject, &vContactPoint);
         orxObject_Enable(explosionObject, orxTRUE);
         orxObject_Enable(blueShipObject, orxFALSE);
         blueHit = true;
+        blueShot = true;
       }
     }
 
-    if (orxString_Compare(senderObjectName, "Red") == 0 && !orxInput_IsActive("RedShoot"))
+    if (orxString_Compare(recipientObjectName, "Blue"))
+    {
+      if (orxString_Compare(senderObjectName, "RedShot") == 0)
+      {
+        orxObject_SetLifeTime(pstSenderObject, 0);
+        orxObject_GetPosition(pstSenderObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(blueShipObject, orxFALSE);
+        blueHit = true;
+        blueShot = true;
+      }
+    }
+
+
+    if (orxString_Compare(senderObjectName, "Red") == 0 )
     {
       if (orxString_Compare(recipientObjectName, "Shot") == 0)
       {
@@ -747,11 +826,50 @@ orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent)
       }
     }
 
-    if (orxString_Compare(senderObjectName, "Alien") == 0 && !orxObject_IsEnabled(alienGunObject))
+    if (orxString_Compare(recipientObjectName, "Red") == 0)
+    {
+      if (orxString_Compare(senderObjectName, "Shot") == 0)
+      {
+        orxObject_SetLifeTime(pstSenderObject, 0);
+        orxObject_GetPosition(pstSenderObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(redShipObject, orxFALSE);
+        redHit = true;
+      }
+    }
+
+    if (orxString_Compare(senderObjectName, "Blue") == 0)
     {
       if (orxString_Compare(recipientObjectName, "Shot") == 0)
       {
-        orxLOG("Alien hit by shot.");
+        orxObject_SetLifeTime(pstRecipientObject, 0);
+        orxObject_GetPosition(pstRecipientObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(blueShipObject, orxFALSE);
+        blueHit = true;
+      }
+    }
+
+    if (orxString_Compare(recipientObjectName, "Blue") == 0)
+    {
+      if (orxString_Compare(senderObjectName, "Shot") == 0)
+      {
+        orxObject_SetLifeTime(pstSenderObject, 0);
+        orxObject_GetPosition(pstSenderObject, &vContactPoint);
+        orxObject_SetPosition(explosionObject, &vContactPoint);
+        orxObject_Enable(explosionObject, orxTRUE);
+        orxObject_Enable(blueShipObject, orxFALSE);
+        blueHit = true;
+      }
+    }
+
+
+    if (orxString_Compare(senderObjectName, "Alien") == 0 && !orxObject_IsEnabled(alienGunObject))
+    {
+      if (orxString_Compare(recipientObjectName, "BlueShot") == 0 || orxString_Compare(recipientObjectName, "RedShot") == 0)
+      {
         orxObject_SetLifeTime(pstRecipientObject, 0);
         orxObject_SetLifeTime(pstSenderObject, 0);
         orxObject_GetPosition(pstRecipientObject, &vContactPoint);
@@ -925,6 +1043,18 @@ orxSTATUS orxFASTCALL Init()
   blueShotCountStructure = orxGraphic_GetData(blueShotCountGraphic);
   blueShotCount = orxTEXT(blueShotCountStructure);
   blueShotCountFont = orxText_GetFont(blueShotCount);
+
+  redKillCountObject = orxObject_CreateFromConfig("RedKillCountObject");
+  redKillCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(redKillCountObject, GRAPHIC));
+  redKillCountStructure = orxGraphic_GetData(redKillCountGraphic);
+  redKillCount = orxTEXT(redKillCountStructure);
+  redKillCountFont = orxText_GetFont(redKillCount);
+
+  blueKillCountObject = orxObject_CreateFromConfig("BlueKillCountObject");
+  blueKillCountGraphic = orxGRAPHIC(orxOBJECT_GET_STRUCTURE(blueKillCountObject, GRAPHIC));
+  blueKillCountStructure = orxGraphic_GetData(blueKillCountGraphic);
+  blueKillCount = orxTEXT(blueKillCountStructure);
+  blueKillCountFont = orxText_GetFont(blueKillCount);
 
 
   // Done!
